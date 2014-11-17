@@ -1,0 +1,30 @@
+body {
+  background: repeat url("../images/bg.png");
+  color: #353132;
+}
+
+.Main {
+  margin: 0 auto;
+  max-width: 960px;
+}
+
+.ChatBox {
+  @include box-shadow(#CCC 0 2px 10px);
+  background-color: #FBFBFB;
+   
+  &-header {
+    @include background-image(linear-gradient(#d2cfac, #ecead5));
+    border-bottom: 1px solid #d3d5b0;
+    margin-bottom: 20px;
+  }
+  
+  &-title {
+    margin: 0;
+    padding: 0 10px;
+    border-bottom: 3px solid #ecead5;
+    
+    span {
+      border-bottom: 4px solid #f3951b;
+    }
+  }
+}
