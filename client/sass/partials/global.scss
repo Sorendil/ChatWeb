@@ -5,6 +5,21 @@ body {
   margin: 0;
 }
 
+/* Text Input */
+input[type='text'] {
+  @extend .roundedborder;
+  padding: .25em;
+  width:100%;
+  box-sizing: border-box;
+}
+
+
+.roundedborder {
+  @include border-radius (.2em);
+  border: 1px solid $border-color;
+}
+
+/* Partials */
 .Header {
   @include clearfix();
   padding: 20px 50px;
@@ -25,39 +40,106 @@ body {
 }
 
 .Main {
-  margin: 0 auto;
-  max-width: 960px;
   
   &-row {
     @include clearfix();
+    @include container(960px);
+  }
+  
+  &-ChatBox {
+    @include span(7 of 10);
+  }
+  
+  &-PseudoList {
+    @include span(3 of 10 last);
   }
 }
 
-@mixin widget-variant($borderColor) {
+@mixin widget-variant($this-border-color) {
   @include box-shadow(#CCC 0 2px 10px);
   background-color: #FBFBFB;
    
   &-header {
-    @include background-image(linear-gradient(#d2cfac, #ecead5));
+    @include background-image(linear-gradient($gradient-color-top, $gradient-color-bottom));
     border-bottom: 1px solid $border-color;
-    margin-bottom: 20px;
   }
   
   &-title {
     margin: 0;
     padding: 0 10px;
-    border-bottom: 3px solid #ecead5;
+    border-bottom: 3px solid $gradient-color-bottom;
     
     span {
-      border-bottom: 4px solid $borderColor;
+      border-bottom: 4px solid $this-border-color;
     }
   }
 }
 
+@mixin widget-write-message() {
+  &-writeMessageContent {
+    background-color: $gradient-color-bottom;
+    padding: 5px;
+  }
+  
+  &-writeMessage {
+    
+  }
+}
+
 .ChatBox {
-  @include widget-variant(#f3951b);
+  @include widget-variant($chat-box-color);
+  @include widget-write-message();
 }
 
 .PseudoList {
-  @include widget-variant(#951bf3);
+  @include widget-variant($pseudo-list-color);
+  
+  &-list {  
+    @include no-bullets;
+    margin: 0 10px;
+    padding: 0;
+  }
+  
+  &-pseudoItem {
+    padding: 2px 0;
+  }
+  
+  &-pseudo {
+    @include unstyled-link;
+    font-weight: bold;
+    color: $text-dark-color;
+    
+    &:hover {
+      color: $main-color;
+    }
+  }
+}
+
+@mixin messages($this-messages-height) {
+  height: $this-messages-height;
+  overflow-y: scroll;
+  
+  &-message {
+    padding: 5px; 
+    border-style: solid;
+    border-color: $border-color;
+    border-width: 0 0 1px;
+  }
+  
+  &:last-child {
+    border-width: 0;
+  }
+  
+  &-author {
+    color: #f3951b;
+    font-weight: bold;
+  }
+  
+  &-content {
+    margin-left: 5px;
+  }
+}
+
+.ChatBoxMessage {
+  @include messages($chat-box-messages-height);
 }
