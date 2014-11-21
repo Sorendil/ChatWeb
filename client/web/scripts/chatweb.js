@@ -67,7 +67,7 @@ $( document ).ready(function() {
                     "<li class=\"PseudoList-pseudoItem\">"
                     + "<a data-pseudo=\""
                     + pseudo
-                    + "\" class=\"PseudoList-pseudo\" href=\"#\">"
+                    + "\" class=\"PseudoList-pseudo js-PseudoList-pseudo\" href=\"#\">"
                     + pseudo
                     + "</a></li>");
             });
@@ -84,7 +84,7 @@ $( document ).ready(function() {
     // Pour chaque pseudo, ouvrir une fenetre de discussion si elle n'est pas déjà ouverte
     // Note : Utilisation de on au lieu de click car un seul gestionnaire d'événement gère les écouteurs
     // de cette manière, on a pas besoin de recréer les écouteurs à chaque fois qu'on ajoute un pseudo
-    $pseudoList.on('click', '.PseudoList-pseudo', function(event) {
+    $pseudoList.on('click', '.js-PseudoList-pseudo', function(event) {
         event.preventDefault();
         
         // La cible de l'événement, soit l'élément <a> qui contient le pseudo
@@ -94,20 +94,38 @@ $( document ).ready(function() {
         // On cherche si une messagerie privée existe déjà avec cette personne
         console.log($privateMessagingContainer);
         // On récupère toutes les messageries privées qui correspondent au pseudo (soit 1 soit 0)
-        $privateMessagings = $privateMessagingContainer.find("[data-receiver='" + pseudoName + "']");
+        $privateMessagings = $privateMessagingContainer.find('[data-receiver="' + pseudoName + '"]');
         // Si on n'a pas trouvé une messagerie privée correspondante ouverte
         if ( ! $privateMessagings.length)
         {
             // On ajoute une nouvelle messagerie privée correspondante !
             $privateMessagingContainer.append(
-                "<div class=\"PrivateMessaging ChatBox\">"
-                + "<header class=\"PrivateMessaging-header ChatBox-header\">"
-                + "<h1 class\="PrivateMessaging-title ChatBox-title"><span>"
+                " <div class=\"Main-PrivateMessaging\">"
+                + "<div data-receiver=\"" + pseudoName + "\" class=\"PrivateMessaging\">"
+                
+                //header
+                + "<header class=\"PrivateMessaging-header\">"
+                + "<h1 class=\"PrivateMessaging-title\"><span>"
                 + pseudoName
                 + "</span></h1></header>"
-                   
                 
-                + "</div>
+                //content
+                + "<div class=\"PrivateMessaging-content\">"
+                + "<div id=\"privateMessages-" + pseudoName + "\" class=\"PrivateMessagingMessage js-PrivateMessagingMessage\">"
+                + "</div>" //.PrivateMessagingMessage
+                + "</div>" //.PrivateMessaging-content
+                
+                //write message
+                + "<div class=\"PrivateMessaging-writeMessageContent\">"
+                + "<div class=\"PrivateMessaging-writeMessage\">"
+                + "<form id=\"privateMessagingForm-" + pseudoName + "\" action=\"#\">"
+                + "<input type=\"text\" name=\"privateMessagingWriteMessage-" + pseudoName + "\" id=\"privateMessagingWriteMessage-" + pseudoName + "\" placeholder=\"Ecrivez votre message\" />"
+                + "</form>"
+                + "</div>" //.PrivateMessaging-writeMessage
+                + "</div>" //.PrivateMessaging-writeMessageContent
+                
+                + "</div>" //.PrivateMessaging
+                + "</div>" //.Main-PrivateMessaging
             );
         }
     });

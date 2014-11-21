@@ -13,13 +13,15 @@ input[type='text'] {
   box-sizing: border-box;
 }
 
-
+/* Bords arrondis
+   Sert à être étendu
+ */
 .roundedborder {
   @include border-radius (.2em);
   border: 1px solid $border-color;
 }
 
-/* Partials */
+/* Partial : Header */
 .Header {
   @include clearfix();
   padding: 20px 50px;
@@ -39,24 +41,35 @@ input[type='text'] {
   }
 }
 
+/* Partial : Layout général */
 .Main {
   
+  /* Grid container */
   &-row {
     @include clearfix();
     @include container(960px);
   }
   
+  /* Grid Chatbox container */
   &-ChatBox {
-    @include span(7 of 10);
+    @include span(3);
   }
   
+  /* Grid PseudoList container */
   &-PseudoList {
-    @include span(3 of 10 last);
+    @include span(1 last);
+  }
+  
+  /* Grid PrivateMessaging containers */
+  &-PrivateMessaging {
+    @include span(2);
   }
 }
 
+/* Mixin : Décrit un widget */
 @mixin widget-variant($this-border-color) {
   @include box-shadow(#CCC 0 2px 10px);
+  margin-bottom: 20px;
   background-color: #FBFBFB;
    
   &-header {
@@ -75,6 +88,7 @@ input[type='text'] {
   }
 }
 
+/* Mixin : Espace pour écrire les messages */
 @mixin widget-write-message() {
   &-writeMessageContent {
     background-color: $gradient-color-bottom;
@@ -86,11 +100,13 @@ input[type='text'] {
   }
 }
 
+/* Widget de Chatbox */
 .ChatBox {
   @include widget-variant($chat-box-color);
   @include widget-write-message();
 }
 
+/* Widget affichant la liste des pseudos */
 .PseudoList {
   @include widget-variant($pseudo-list-color);
   
@@ -115,6 +131,13 @@ input[type='text'] {
   }
 }
 
+/* Widget de PrivateMessaging */
+.PrivateMessaging {
+  @include widget-variant($private-messaging-color);
+  @include widget-write-message();
+}
+
+/* Styles des messages */
 @mixin messages($this-messages-height) {
   height: $this-messages-height;
   overflow-y: scroll;
@@ -140,6 +163,7 @@ input[type='text'] {
   }
 }
 
+// Messages pour la Chat Box
 .ChatBoxMessage {
   @include messages($chat-box-messages-height);
 }

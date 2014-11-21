@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* line 1, ../../sass/partials/global.scss */
 body {
   background: repeat url("../images/bg.png");
@@ -14,7 +15,10 @@ input[type='text'] {
   box-sizing: border-box;
 }
 
-/* line 17, ../../sass/partials/global.scss */
+/* Bords arrondis
+   Sert à être étendu
+ */
+/* line 19, ../../sass/partials/global.scss */
 .roundedborder, input[type='text'] {
   -moz-border-radius: 0.2em;
   -webkit-border-radius: 0.2em;
@@ -22,8 +26,8 @@ input[type='text'] {
   border: 1px solid #d3d5b0;
 }
 
-/* Partials */
-/* line 23, ../../sass/partials/global.scss */
+/* Partial : Header */
+/* line 25, ../../sass/partials/global.scss */
 .Header {
   overflow: hidden;
   *zoom: 1;
@@ -32,18 +36,26 @@ input[type='text'] {
   background-color: white;
   border-bottom: 1px solid #d3d5b0;
 }
-/* line 31, ../../sass/partials/global.scss */
+/* line 33, ../../sass/partials/global.scss */
 .Header-title {
   margin: 0;
   float: left;
 }
-/* line 36, ../../sass/partials/global.scss */
+/* line 38, ../../sass/partials/global.scss */
 .Header-menu {
   margin: 0;
   padding: 0;
 }
 
-/* line 44, ../../sass/partials/global.scss */
+/* Partial : Layout général */
+/* line 45, ../../sass/partials/global.scss */
+.Main {
+  /* Grid container */
+  /* Grid Chatbox container */
+  /* Grid PseudoList container */
+  /* Grid PrivateMessaging containers */
+}
+/* line 48, ../../sass/partials/global.scss */
 .Main-row {
   overflow: hidden;
   *zoom: 1;
@@ -57,27 +69,40 @@ input[type='text'] {
   display: block;
   clear: both;
 }
-/* line 49, ../../sass/partials/global.scss */
+/* line 54, ../../sass/partials/global.scss */
 .Main-ChatBox {
-  width: 69.38776%;
+  width: 72.22222%;
   float: left;
-  margin-right: 2.04082%;
+  margin-left: 1.38889%;
+  margin-right: 1.38889%;
 }
-/* line 53, ../../sass/partials/global.scss */
+/* line 59, ../../sass/partials/global.scss */
 .Main-PseudoList {
-  width: 28.57143%;
+  width: 22.22222%;
   float: right;
-  margin-right: 0;
+  margin-left: 1.38889%;
+  margin-right: 1.38889%;
+}
+/* line 64, ../../sass/partials/global.scss */
+.Main-PrivateMessaging {
+  width: 47.22222%;
+  float: left;
+  margin-left: 1.38889%;
+  margin-right: 1.38889%;
 }
 
-/* line 89, ../../sass/partials/global.scss */
+/* Mixin : Décrit un widget */
+/* Mixin : Espace pour écrire les messages */
+/* Widget de Chatbox */
+/* line 104, ../../sass/partials/global.scss */
 .ChatBox {
   -moz-box-shadow: #CCC 0 2px 10px;
   -webkit-box-shadow: #CCC 0 2px 10px;
   box-shadow: #CCC 0 2px 10px;
+  margin-bottom: 20px;
   background-color: #FBFBFB;
 }
-/* line 62, ../../sass/partials/global.scss */
+/* line 75, ../../sass/partials/global.scss */
 .ChatBox-header {
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2QyY2ZhYyIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2VjZWFkNSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
   background-size: 100%;
@@ -87,30 +112,32 @@ input[type='text'] {
   background-image: linear-gradient(#d2cfac, #ecead5);
   border-bottom: 1px solid #d3d5b0;
 }
-/* line 67, ../../sass/partials/global.scss */
+/* line 80, ../../sass/partials/global.scss */
 .ChatBox-title {
   margin: 0;
   padding: 0 10px;
   border-bottom: 3px solid #ecead5;
 }
-/* line 72, ../../sass/partials/global.scss */
+/* line 85, ../../sass/partials/global.scss */
 .ChatBox-title span {
   border-bottom: 4px solid #f3951b;
 }
-/* line 79, ../../sass/partials/global.scss */
+/* line 93, ../../sass/partials/global.scss */
 .ChatBox-writeMessageContent {
   background-color: #ecead5;
   padding: 5px;
 }
 
-/* line 94, ../../sass/partials/global.scss */
+/* Widget affichant la liste des pseudos */
+/* line 110, ../../sass/partials/global.scss */
 .PseudoList {
   -moz-box-shadow: #CCC 0 2px 10px;
   -webkit-box-shadow: #CCC 0 2px 10px;
   box-shadow: #CCC 0 2px 10px;
+  margin-bottom: 20px;
   background-color: #FBFBFB;
 }
-/* line 62, ../../sass/partials/global.scss */
+/* line 75, ../../sass/partials/global.scss */
 .PseudoList-header {
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2QyY2ZhYyIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2VjZWFkNSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
   background-size: 100%;
@@ -120,17 +147,17 @@ input[type='text'] {
   background-image: linear-gradient(#d2cfac, #ecead5);
   border-bottom: 1px solid #d3d5b0;
 }
-/* line 67, ../../sass/partials/global.scss */
+/* line 80, ../../sass/partials/global.scss */
 .PseudoList-title {
   margin: 0;
   padding: 0 10px;
   border-bottom: 3px solid #ecead5;
 }
-/* line 72, ../../sass/partials/global.scss */
+/* line 85, ../../sass/partials/global.scss */
 .PseudoList-title span {
   border-bottom: 4px solid #951bf3;
 }
-/* line 97, ../../sass/partials/global.scss */
+/* line 113, ../../sass/partials/global.scss */
 .PseudoList-list {
   list-style: none;
   margin: 0 10px;
@@ -142,11 +169,11 @@ input[type='text'] {
   list-style-type: none;
   margin-left: 0;
 }
-/* line 103, ../../sass/partials/global.scss */
+/* line 119, ../../sass/partials/global.scss */
 .PseudoList-pseudoItem {
   padding: 2px 0;
 }
-/* line 107, ../../sass/partials/global.scss */
+/* line 123, ../../sass/partials/global.scss */
 .PseudoList-pseudo {
   color: inherit;
   text-decoration: inherit;
@@ -158,33 +185,69 @@ input[type='text'] {
 .PseudoList-pseudo:active, .PseudoList-pseudo:focus {
   outline: none;
 }
-/* line 112, ../../sass/partials/global.scss */
+/* line 128, ../../sass/partials/global.scss */
 .PseudoList-pseudo:hover {
   color: #f3951b;
 }
 
-/* line 143, ../../sass/partials/global.scss */
+/* Widget de PrivateMessaging */
+/* line 135, ../../sass/partials/global.scss */
+.PrivateMessaging {
+  -moz-box-shadow: #CCC 0 2px 10px;
+  -webkit-box-shadow: #CCC 0 2px 10px;
+  box-shadow: #CCC 0 2px 10px;
+  margin-bottom: 20px;
+  background-color: #FBFBFB;
+}
+/* line 75, ../../sass/partials/global.scss */
+.PrivateMessaging-header {
+  background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2QyY2ZhYyIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2VjZWFkNSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
+  background-size: 100%;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #d2cfac), color-stop(100%, #ecead5));
+  background-image: -moz-linear-gradient(#d2cfac, #ecead5);
+  background-image: -webkit-linear-gradient(#d2cfac, #ecead5);
+  background-image: linear-gradient(#d2cfac, #ecead5);
+  border-bottom: 1px solid #d3d5b0;
+}
+/* line 80, ../../sass/partials/global.scss */
+.PrivateMessaging-title {
+  margin: 0;
+  padding: 0 10px;
+  border-bottom: 3px solid #ecead5;
+}
+/* line 85, ../../sass/partials/global.scss */
+.PrivateMessaging-title span {
+  border-bottom: 4px solid #305763;
+}
+/* line 93, ../../sass/partials/global.scss */
+.PrivateMessaging-writeMessageContent {
+  background-color: #ecead5;
+  padding: 5px;
+}
+
+/* Styles des messages */
+/* line 167, ../../sass/partials/global.scss */
 .ChatBoxMessage {
   height: 300px;
   overflow-y: scroll;
 }
-/* line 122, ../../sass/partials/global.scss */
+/* line 145, ../../sass/partials/global.scss */
 .ChatBoxMessage-message {
   padding: 5px;
   border-style: solid;
   border-color: #d3d5b0;
   border-width: 0 0 1px;
 }
-/* line 129, ../../sass/partials/global.scss */
+/* line 152, ../../sass/partials/global.scss */
 .ChatBoxMessage:last-child {
   border-width: 0;
 }
-/* line 133, ../../sass/partials/global.scss */
+/* line 156, ../../sass/partials/global.scss */
 .ChatBoxMessage-author {
   color: #f3951b;
   font-weight: bold;
 }
-/* line 138, ../../sass/partials/global.scss */
+/* line 161, ../../sass/partials/global.scss */
 .ChatBoxMessage-content {
   margin-left: 5px;
 }

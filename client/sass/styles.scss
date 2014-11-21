@@ -8,5 +8,11 @@
 @import "compass/typography/links/unstyled-link";
 @import "susy";
 
+$susy: (
+    columns: 4,
+    gutters: 1/8,
+    gutter-position: split
+);
+
 // Partials
 @import "partials/global.scss";
