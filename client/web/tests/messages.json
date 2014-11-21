@@ -1,0 +1,47 @@
+{
+    "chatbox": {
+        "messages": [
+            {
+                "author": "Sorendil",
+                "content": "Je suis trop clôsse"
+            },
+            {
+                "author": "Joh l'âne",
+                "content": "Et moi un âne"
+            },
+            {
+                "author": "SebLuvsJura",
+                "content": "Vive le JURAAAA \\o/"
+            },
+            {
+                "author": "SebLuvsJura",
+                "content": "Vive le JURAAAA2 \\o/"
+            },
+            {
+                "author": "SebLuvsJura",
+                "content": "Vive le JURAAAA3 \\o/"
+            },
+            {
+                "author": "SebLuvsJura",
+                "content": "Vive le JURAAAA4 \\o/"
+            }
+        ]
+    },
+    "privateRooms": [
+        {
+            "receiver": "Joh l'âne",
+            "messages": [
+                {
+                    "author": "Sorendil",
+                    "content": "Je suis trop clôsse"
+                },
+                {
+                    "author": "Joh l'âne",
+                    "content": "Et moi un âne"
+                }
+            ]
+        }
+    ]
+}
+        
+    
