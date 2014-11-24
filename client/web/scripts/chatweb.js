@@ -8,15 +8,22 @@ jQuery.fn.extend({
         this.scrollTop(this.prop("scrollHeight"));
 }});
 
+$.ajaxSetup({ cache: false });
+
 
 $( document ).ready(function() {
 
+    // ======== DONNEES
+    // ====================
+    
     // ======= CHAT BOX
     
     // Le <input> d'envoi de messages pour la Chatbox
     $chatBoxWriteMessage = $("#chatBoxWriteMessage");
     $chatBoxForm = $("#chatBoxForm");
     $chatBoxMessages = $("#chatBoxMessages");
+    
+    console.log((new Date()).getTime());
     
     // A l'envoi du formulaire
     $chatBoxForm.submit(function( event ) {
@@ -111,7 +118,7 @@ $( document ).ready(function() {
                 
                 //content
                 + "<div class=\"PrivateMessaging-content\">"
-                + "<div id=\"privateMessages-" + pseudoName + "\" class=\"PrivateMessagingMessage js-PrivateMessagingMessage\">"
+                + "<div class=\"PrivateMessagingMessage js-PrivateMessagingMessage\">"
                 + "</div>" //.PrivateMessagingMessage
                 + "</div>" //.PrivateMessaging-content
                 
@@ -152,30 +159,174 @@ $( document ).ready(function() {
             dataType: "json"
         })
         .done( function( data ){
-        
-            // La liste des messages de la chatbox
-            chatBoxMessages = data.chatbox.messages;
-            
-            // On vide l'affichage des pseudos
-            $chatBoxMessages.empty();
-            
-            // Pour chaque message
-            $.each( chatBoxMessages, function( key, chatBoxMessage ) {
-                //console.log(chatBoxMessage);
-                $chatBoxMessages.append(
-                    "<div class=\"ChatBoxMessage-message\">"
-                    + "<div class=\"ChatBoxMessage-author\">"
-                    + chatBoxMessage.author
-                    + "</div>"
-                    + "<div class=\"ChatBoxMessage-content\">"
-                    + chatBoxMessage.content
-                    + "</div></div>")
-            });
-            
+            manageChatBoxMessages( data );
+            managePrivateMessagingMessages( data );
         })
         .fail( function(data) {
             console.log("fichier non charge");
         });
     }, 2000);
+    
+    // Traitement des messages de la chat box
+    var manageChatBoxMessages = function( data ) {
+        // La liste des messages de la chatbox
+        chatBoxMessages = data.chatbox.messages;
+        
+        manageMessages( $chatBoxMessages, chatBoxMessages, "ChatBoxMessage", false );
+    };
+    
+    // Traitement des messages de messagerie privée
+    var managePrivateMessagingMessages = function( data ) {
+        // La liste des différentes fils de discussion
+        privateRooms = data.privateRooms;
+        
+        // Pour chaque Messagerie Privée
+        $.each( privateRooms, function( key, privateRoom ) {
+            // La liste des messages récupérés pour la messagerie privée courante
+            privateRoomMessages = privateRoom.messages;
+            
+            // Le pseudo
+            pseudoName = privateRoom.receiver;
+            
+            // On récupère le container des messages de la messagerie privée si elle est ouverte
+            $privateRoomContainer = $privateMessagingContainer.find('[data-receiver="' + pseudoName + '"]');
+            
+            // Si il est bien ouvert (donc si on a bien trouvé le container)
+            if ($privateRoomContainer.length)
+            {
+                $privateRoomMessagesContainer = $privateRoomContainer.find(".js-PrivateMessagingMessage");
+                manageMessages( $privateRoomMessagesContainer, privateRoomMessages, "PrivateMessagingMessage", true );
+            }
+        });
+    };
+    
+    /**
+     * Gère les messages pour un bloc de message et des messages donnés
+     * @param $messagesContainer L'élément du DOM contenant les messages à insérer/gérer
+     * @param messages La liste des messages en objet json
+     * @param blocMessageName Le nom du bloc HTML des messages
+     * @param privateMessaging booléen : vrai si il s'agit de messages d'une messagerie privée, faux pour la chatbox
+     */
+    var manageMessages = function( $messagesContainer, getMessages, blocMessageName, privateMessaging ) {
+        
+        // Les messages déjà existants dans le DOM et leur nombre
+        $existingMessages = $messagesContainer.children();
+        nbExistingMessages = $existingMessages.length;
+        
+        // L'ID courant du message existant. 
+        // Pour l'instant, on en est au premier, donc 0
+        currentIdExistingMessage = 0;
+        
+        // Les messages récupérés en json et leur nombre
+        // messages
+        nbGetMessages = getMessages.length;
+        
+        // L'ID courant du message récupéré.
+        // Pour l'instant on en est au premier donc 0
+        currentIdGetMessage = 0;
+        
+        // Pour enlever le Chargement en cours
+        if ( ! nbExistingMessages )
+        {
+            $messagesContainer.empty();
+        }
+        
+        while( currentIdExistingMessage < nbExistingMessages ||
+            currentIdGetMessage < nbGetMessages ) {
+            
+            // Si il n'y a plus de messages existants
+            if ( currentIdExistingMessage >= nbExistingMessages )
+            {
+                message = getMessages[currentIdGetMessage];
+                
+                // on ajoute les messages entrants à la suite
+                $messagesContainer.append(
+                    "<div data-message-time=\"" + message.time + "\" data-message-id=\"" + message.id + "\" class=\"" + blocMessageName + "-message\">"
+                    + "<div class=\"" + blocMessageName + "-author\">"
+                    + message.author
+                    + "</div>"
+                    + "<div class=\"" + blocMessageName + "-content\">"
+                    + message.content
+                    + "</div></div>");
+                
+                currentIdGetMessage++;
+            }
+            // Si il reste au moins un message déjà existant (dans le DOM)
+            else
+            {
+                // Si il ne reste plus de message entrant à vérifier
+                if ( currentIdGetMessage >= nbGetMessages )
+                {
+                    // Alors on n'a plus rien à faire et il faut dire à la boucle de s'arrêter en forcant la condition d'arrêt
+                    currentIdExistingMessage = nbExistingMessages;
+                }
+                // Si on est dans le cas où il reste au moins un message existant à vérifier et au moins un message entrant à vérifier
+                else
+                {
+                    // Si le message existant et le message entrant courant est le meme
+                    if ( $existingMessages.eq(currentIdExistingMessage).data( "messageId" )
+                    == getMessages[currentIdGetMessage].id )
+                    {
+                        // Alors on a rien à faire pour ces deux messages
+                        // et on avance le curseur des messages existants
+                        // et des messages récupérés
+                        currentIdExistingMessage++;
+                        currentIdGetMessage++;
+                    }
+                    // Si le message existant courant est plus vieux que le message récupéré courant
+                    else if ( $existingMessages.eq(currentIdExistingMessage).data( "messageTime" ) <= getMessages[currentIdGetMessage].time )
+                    {
+                        // Alors on avance le curseur des messages existants
+                        currentIdExistingMessage++;
+                    }
+                    // Sinon, si le message existant courant est plus jeune que le message récupéré courant
+                    else
+                    {
+                        message = getMessages[currentIdGetMessage];
+                        $existingMessages.eq(currentIdExistingMessage).before(
+                            "<div data-message-time=\"" + message.time + "\" data-message-id=\"" + message.id + "\" class=\"" + blocMessageName + "-message\">"
+                            + "<div class=\"" + blocMessageName + "-author\">"
+                            + message.author
+                            + "</div>"
+                            + "<div class=\"" + blocMessageName + "-content\">"
+                            + message.content
+                            + "</div></div>");
+                        
+                        // On avance le curseur des messages récupérés
+                        currentIdGetMessage++;
+                    }
+                }
+            }
+        }
+        
+        
+        // Pour chaque message
+        /*$.each( messages, function( key, message ) {
+            
+            while( currentIdExistingMessage < nbExistingMessages )
+            {
+                if( $existingMessages[currentIdExistingMessage]
+            }
+            if ( $nbMessagesBefore )
+            {
+                // Si il y a déjà des messages existants
+                
+            }
+            else
+            {
+                // Si il n'y avait pas encore de messages existants,
+                // on les ajoute à la suite
+                $messagesContainer.append(
+                    "<div data-message-time=\"" + message.time + "\" data-message-id=\"" + message.id + "\" class=\"" + blocMessageName + "-message\">"
+                    + "<div class=\"" + blocMessageName + "-author\">"
+                    + message.author
+                    + "</div>"
+                    + "<div class=\"" + blocMessageName + "-content\">"
+                    + message.content
+                    + "</div></div>");
+            }
+            
+        });*/
+    };
     
 });

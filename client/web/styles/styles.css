@@ -251,3 +251,29 @@ input[type='text'] {
 .ChatBoxMessage-content {
   margin-left: 5px;
 }
+
+/* line 172, ../../sass/partials/global.scss */
+.PrivateMessagingMessage {
+  height: 200px;
+  overflow-y: scroll;
+}
+/* line 145, ../../sass/partials/global.scss */
+.PrivateMessagingMessage-message {
+  padding: 5px;
+  border-style: solid;
+  border-color: #d3d5b0;
+  border-width: 0 0 1px;
+}
+/* line 152, ../../sass/partials/global.scss */
+.PrivateMessagingMessage:last-child {
+  border-width: 0;
+}
+/* line 156, ../../sass/partials/global.scss */
+.PrivateMessagingMessage-author {
+  color: #f3951b;
+  font-weight: bold;
+}
+/* line 161, ../../sass/partials/global.scss */
+.PrivateMessagingMessage-content {
+  margin-left: 5px;
+}

@@ -167,3 +167,8 @@ input[type='text'] {
 .ChatBoxMessage {
   @include messages($chat-box-messages-height);
 }
+
+// Messages pour les messageries privées
+.PrivateMessagingMessage {
+  @include messages($private-messaging-messages-height);
+}
