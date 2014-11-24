@@ -174,6 +174,10 @@ input[type='text'] {
   padding: 2px 0;
 }
 /* line 123, ../../sass/partials/global.scss */
+.PseudoList-pseudoItem_new .PseudoList-pseudo {
+  color: #f3951b;
+}
+/* line 129, ../../sass/partials/global.scss */
 .PseudoList-pseudo {
   color: inherit;
   text-decoration: inherit;
@@ -185,13 +189,13 @@ input[type='text'] {
 .PseudoList-pseudo:active, .PseudoList-pseudo:focus {
   outline: none;
 }
-/* line 128, ../../sass/partials/global.scss */
+/* line 134, ../../sass/partials/global.scss */
 .PseudoList-pseudo:hover {
   color: #f3951b;
 }
 
 /* Widget de PrivateMessaging */
-/* line 135, ../../sass/partials/global.scss */
+/* line 141, ../../sass/partials/global.scss */
 .PrivateMessaging {
   -moz-box-shadow: #CCC 0 2px 10px;
   -webkit-box-shadow: #CCC 0 2px 10px;
@@ -226,54 +230,54 @@ input[type='text'] {
 }
 
 /* Styles des messages */
-/* line 167, ../../sass/partials/global.scss */
+/* line 173, ../../sass/partials/global.scss */
 .ChatBoxMessage {
   height: 300px;
   overflow-y: scroll;
 }
-/* line 145, ../../sass/partials/global.scss */
+/* line 151, ../../sass/partials/global.scss */
 .ChatBoxMessage-message {
   padding: 5px;
   border-style: solid;
   border-color: #d3d5b0;
   border-width: 0 0 1px;
 }
-/* line 152, ../../sass/partials/global.scss */
+/* line 158, ../../sass/partials/global.scss */
 .ChatBoxMessage:last-child {
   border-width: 0;
 }
-/* line 156, ../../sass/partials/global.scss */
+/* line 162, ../../sass/partials/global.scss */
 .ChatBoxMessage-author {
   color: #f3951b;
   font-weight: bold;
 }
-/* line 161, ../../sass/partials/global.scss */
+/* line 167, ../../sass/partials/global.scss */
 .ChatBoxMessage-content {
   margin-left: 5px;
 }
 
-/* line 172, ../../sass/partials/global.scss */
+/* line 178, ../../sass/partials/global.scss */
 .PrivateMessagingMessage {
   height: 200px;
   overflow-y: scroll;
 }
-/* line 145, ../../sass/partials/global.scss */
+/* line 151, ../../sass/partials/global.scss */
 .PrivateMessagingMessage-message {
   padding: 5px;
   border-style: solid;
   border-color: #d3d5b0;
   border-width: 0 0 1px;
 }
-/* line 152, ../../sass/partials/global.scss */
+/* line 158, ../../sass/partials/global.scss */
 .PrivateMessagingMessage:last-child {
   border-width: 0;
 }
-/* line 156, ../../sass/partials/global.scss */
+/* line 162, ../../sass/partials/global.scss */
 .PrivateMessagingMessage-author {
   color: #f3951b;
   font-weight: bold;
 }
-/* line 161, ../../sass/partials/global.scss */
+/* line 167, ../../sass/partials/global.scss */
 .PrivateMessagingMessage-content {
   margin-left: 5px;
 }

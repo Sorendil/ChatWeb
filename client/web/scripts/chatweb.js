@@ -48,7 +48,6 @@ $( document ).ready(function() {
         
         // On efface le input
         $chatBoxWriteMessage.val("");
-        //console.log( "Handler for .submit() called." );
     });
     
     // ======== PSEUDO LIST
@@ -64,24 +63,41 @@ $( document ).ready(function() {
             // La liste des pseudos
             pseudos = data.pseudos;
             
-            // On vide l'affichage des pseudos
-            $pseudoList.empty();
+            // La liste des pseudos existants déjà dans le DOM
+            $existingPseudos = $pseudoList.find('.js-PseudoList-pseudo');
+            $existingPseudos.data("seen", false);
+            
+            // Pour enlever le Chargement en cours
+            if ( ! $existingPseudos.length )
+            {
+                $pseudoList.empty();
+            }
             
             // Pour chaque pseudo
             $.each( pseudos, function( key, pseudo ) {
-                //console.log(pseudo);
-                $pseudoList.append(
-                    "<li class=\"PseudoList-pseudoItem\">"
-                    + "<a data-pseudo=\""
-                    + pseudo
-                    + "\" class=\"PseudoList-pseudo js-PseudoList-pseudo\" href=\"#\">"
-                    + pseudo
-                    + "</a></li>");
+                // On cherche si le pseudo est déjà dans le DOM
+                $existingPseudo = $existingPseudos.filter('[data-pseudo=\"' + pseudo + '\"]');
+                
+                // Si il n'a pas été trouvé
+                if ( ! $existingPseudo.length )
+                {
+                    $newPseudo = $("<li data-pseudo=\"" + pseudo + "\" class=\"PseudoList-pseudoItem js-PseudoList-pseudo\">"
+                        + "<a class=\"PseudoList-pseudo\" href=\"#\">"
+                        + pseudo
+                        + "</a></li>");
+                    $newPseudo.data("seen", "true");
+                    $pseudoList.append($newPseudo);
+                }
+                $existingPseudo.data("seen", "coucou");
             });
+            // On supprime tous les pseudos qui n'ont pas été trouvés
+            $existingPseudos.filter(function() { 
+              return $(this).data("seen") == false 
+            }).remove();
             
         })
         .fail( function(data) {
-            //console.log("fichier non charge");
+            console.log("fichier non charge");
         });
     }, 4000);
     
@@ -91,16 +107,18 @@ $( document ).ready(function() {
     // Pour chaque pseudo, ouvrir une fenetre de discussion si elle n'est pas déjà ouverte
     // Note : Utilisation de on au lieu de click car un seul gestionnaire d'événement gère les écouteurs
     // de cette manière, on a pas besoin de recréer les écouteurs à chaque fois qu'on ajoute un pseudo
-    $pseudoList.on('click', '.js-PseudoList-pseudo', function(event) {
+    $pseudoList.on('click', '.js-PseudoList-pseudo a', function(event) {
         event.preventDefault();
         
         // La cible de l'événement, soit l'élément <a> qui contient le pseudo
         $pseudoLink = $(this);
-        pseudoName = $pseudoLink.data("pseudo");
+        $pseudoContainer = $pseudoLink.parents('.js-PseudoList-pseudo');
+        pseudoName = $pseudoContainer.data("pseudo");
+        
+        // On signale qu'on a cliqué (pour supprimer la surbrillance)
+        $pseudoContainer.removeClass("PseudoList-pseudoItem_new");
         
         // On cherche si une messagerie privée existe déjà avec cette personne
-        console.log($privateMessagingContainer);
-        // On récupère toutes les messageries privées qui correspondent au pseudo (soit 1 soit 0)
         $privateMessagings = $privateMessagingContainer.find('[data-receiver="' + pseudoName + '"]');
         // Si on n'a pas trouvé une messagerie privée correspondante ouverte
         if ( ! $privateMessagings.length)
@@ -191,23 +209,62 @@ $( document ).ready(function() {
             // On récupère le container des messages de la messagerie privée si elle est ouverte
             $privateRoomContainer = $privateMessagingContainer.find('[data-receiver="' + pseudoName + '"]');
             
+            // L'élément du pseudo
+            $pseudo = $pseudoList.find('.js-PseudoList-pseudo[data-pseudo="' + pseudoName + '"]');
+            
             // Si il est bien ouvert (donc si on a bien trouvé le container)
             if ($privateRoomContainer.length)
             {
                 $privateRoomMessagesContainer = $privateRoomContainer.find(".js-PrivateMessagingMessage");
-                manageMessages( $privateRoomMessagesContainer, privateRoomMessages, "PrivateMessagingMessage", true );
+                lastTimeMessageReceived = manageMessages( $privateRoomMessagesContainer, privateRoomMessages, "PrivateMessagingMessage", pseudoName );
             }
+            // Si il est fermé
+            else
+            {
+                lastTimeMessageReceived = getLastTimeMessageReceived( privateRoomMessages );
+                
+                // Si l'ancien temps du message reçu est plus vieux que le nouveau
+                if ( $pseudo.data( 'lastTimeMessageReceived' ) < lastTimeMessageReceived )
+                {
+                    // On notifie que l'utilisateur a écrit un nouveau message
+                    $pseudo.addClass('PseudoList-pseudoItem_new');
+                }
+                
+            }
+            
+            // On met à jour le temps du dernier message reçu dans l'attribut data-last-time-message-received du pseudo en question
+            $pseudo.data( 'lastTimeMessageReceived', lastTimeMessageReceived );
         });
     };
+    
+    /** Récupère le temps du dernier message reçu depuis un partenaire dans une messagerie privée
+     */
+    var getLastTimeMessageReceived = function( getMessages, receiver )
+    {
+        // Temps du dernier message reçu
+        lastTimeMessageReceived = null;
+        
+        // Pour chaque message reçu
+        $.each( getMessages, function( key, getMessage ) {
+            if ( receiver != getMessage.author )
+            {
+                lastTimeMessageReceived = getMessage.time;
+            }
+        });
+        
+        return lastTimeMessageReceived;
+    }
     
     /**
      * Gère les messages pour un bloc de message et des messages donnés
      * @param $messagesContainer L'élément du DOM contenant les messages à insérer/gérer
      * @param messages La liste des messages en objet json
      * @param blocMessageName Le nom du bloc HTML des messages
-     * @param privateMessaging booléen : vrai si il s'agit de messages d'une messagerie privée, faux pour la chatbox
+     * @param privateMessagingWith Nom du destinataire si il s'agit de messages d'une messagerie privée, false pour la chatbox.
+     * @return L'ID du dernier message reçu par le destinataire dans le cas d'une messagerie privée si il existe,
+     * rien s'il n'existe pas ou si il s'agit de la chatbox
      */
-    var manageMessages = function( $messagesContainer, getMessages, blocMessageName, privateMessaging ) {
+    var manageMessages = function( $messagesContainer, getMessages, blocMessageName, privateMessagingWith ) {
         
         // Les messages déjà existants dans le DOM et leur nombre
         $existingMessages = $messagesContainer.children();
@@ -225,28 +282,38 @@ $( document ).ready(function() {
         // Pour l'instant on en est au premier donc 0
         currentIdGetMessage = 0;
         
+        // Temps du dernier message reçu
+        lastTimeMessageReceived = null;
+        
         // Pour enlever le Chargement en cours
         if ( ! nbExistingMessages )
         {
             $messagesContainer.empty();
         }
         
-        while( currentIdExistingMessage < nbExistingMessages ||
-            currentIdGetMessage < nbGetMessages ) {
+        while( currentIdGetMessage < nbGetMessages ) {
+            
+            currentGetMessage = getMessages[currentIdGetMessage];
+            
+            // Si on est en mode messagerie privée
+            // et si le message reçu courant n'est pas un message de l'utilisateur actuel
+            if ( privateMessagingWith &&
+                currentGetMessage.author != privateMessagingWith)
+            {
+                lastTimeMessageReceived = currentGetMessage.time;
+            }
             
             // Si il n'y a plus de messages existants
             if ( currentIdExistingMessage >= nbExistingMessages )
             {
-                message = getMessages[currentIdGetMessage];
-                
                 // on ajoute les messages entrants à la suite
                 $messagesContainer.append(
-                    "<div data-message-time=\"" + message.time + "\" data-message-id=\"" + message.id + "\" class=\"" + blocMessageName + "-message\">"
+                    "<div data-message-time=\"" + currentGetMessage.time + "\" data-message-id=\"" + currentGetMessage.id + "\" class=\"" + blocMessageName + "-message\">"
                     + "<div class=\"" + blocMessageName + "-author\">"
-                    + message.author
+                    + currentGetMessage.author
                     + "</div>"
                     + "<div class=\"" + blocMessageName + "-content\">"
-                    + message.content
+                    + currentGetMessage.content
                     + "</div></div>");
                 
                 currentIdGetMessage++;
@@ -265,7 +332,7 @@ $( document ).ready(function() {
                 {
                     // Si le message existant et le message entrant courant est le meme
                     if ( $existingMessages.eq(currentIdExistingMessage).data( "messageId" )
-                    == getMessages[currentIdGetMessage].id )
+                    == currentGetMessage.id )
                     {
                         // Alors on a rien à faire pour ces deux messages
                         // et on avance le curseur des messages existants
@@ -274,7 +341,7 @@ $( document ).ready(function() {
                         currentIdGetMessage++;
                     }
                     // Si le message existant courant est plus vieux que le message récupéré courant
-                    else if ( $existingMessages.eq(currentIdExistingMessage).data( "messageTime" ) <= getMessages[currentIdGetMessage].time )
+                    else if ( $existingMessages.eq(currentIdExistingMessage).data( "messageTime" ) <= currentGetMessage.time )
                     {
                         // Alors on avance le curseur des messages existants
                         currentIdExistingMessage++;
@@ -282,14 +349,13 @@ $( document ).ready(function() {
                     // Sinon, si le message existant courant est plus jeune que le message récupéré courant
                     else
                     {
-                        message = getMessages[currentIdGetMessage];
                         $existingMessages.eq(currentIdExistingMessage).before(
-                            "<div data-message-time=\"" + message.time + "\" data-message-id=\"" + message.id + "\" class=\"" + blocMessageName + "-message\">"
+                            "<div data-message-time=\"" + currentGetMessage.time + "\" data-message-id=\"" + currentGetMessage.id + "\" class=\"" + blocMessageName + "-message\">"
                             + "<div class=\"" + blocMessageName + "-author\">"
-                            + message.author
+                            + currentGetMessage.author
                             + "</div>"
                             + "<div class=\"" + blocMessageName + "-content\">"
-                            + message.content
+                            + currentGetMessage.content
                             + "</div></div>");
                         
                         // On avance le curseur des messages récupérés
@@ -299,34 +365,7 @@ $( document ).ready(function() {
             }
         }
         
-        
-        // Pour chaque message
-        /*$.each( messages, function( key, message ) {
-            
-            while( currentIdExistingMessage < nbExistingMessages )
-            {
-                if( $existingMessages[currentIdExistingMessage]
-            }
-            if ( $nbMessagesBefore )
-            {
-                // Si il y a déjà des messages existants
-                
-            }
-            else
-            {
-                // Si il n'y avait pas encore de messages existants,
-                // on les ajoute à la suite
-                $messagesContainer.append(
-                    "<div data-message-time=\"" + message.time + "\" data-message-id=\"" + message.id + "\" class=\"" + blocMessageName + "-message\">"
-                    + "<div class=\"" + blocMessageName + "-author\">"
-                    + message.author
-                    + "</div>"
-                    + "<div class=\"" + blocMessageName + "-content\">"
-                    + message.content
-                    + "</div></div>");
-            }
-            
-        });*/
+        return lastTimeMessageReceived;
     };
     
 });

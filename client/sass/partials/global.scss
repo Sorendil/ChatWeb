@@ -118,6 +118,12 @@ input[type='text'] {
   
   &-pseudoItem {
     padding: 2px 0;
+    
+    &_new {
+      .PseudoList-pseudo {
+        color: $main-color;
+      }
+    }
   }
   
   &-pseudo {
