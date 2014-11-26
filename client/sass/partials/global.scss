@@ -14,6 +14,10 @@ input[type='text'] {
   box-sizing: border-box;
 }
 
+.whenPseudo {
+  display: none;
+}
+
 /* Bords arrondis
    Sert à être étendu
  */
@@ -140,6 +144,18 @@ button.close {
 .ChatBox {
   @include widget-variant($chat-box-color);
   @include widget-write-message();
+}
+
+/* Widget de selection du pseudo */
+.SelectPseudo {
+  @include widget-variant($chat-box-color);
+  @include widget-write-message();
+  @include container(960px);
+  
+  p {
+    padding: 5px;
+    margin: 0;
+  }
 }
 
 /* Widget affichant la liste des pseudos */

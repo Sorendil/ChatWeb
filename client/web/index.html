@@ -14,14 +14,29 @@
         </ul>
     </header>
     <div class="Main">
-        <div class="Main-row">
+        <div class="Main-selectPseudo js-selectPseudoContainer">
+            <div class="SelectPseudo">
+                <header class="SelectPseudo-header">
+                    <h1 class="SelectPseudo-title"><span>Entrez votre pseudo</span></h1>
+                </header>
+                <div class="SelectPseudo-content">
+                    <p>Pour accéder au chat, nous avons besoin de votre pseudo !</p>
+                </div>
+                <div class="SelectPseudo-writeMessageContent">
+                    <form id="selectPseudoForm" action="#">
+                        <input type="text" class="js-selectPseudoInput" name="selectPseudoInput" placeholder="Entrez votre pseudo ici" />
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="Main-row whenPseudo">
             <div class="Main-ChatBox">
-                <div class="ChatBox">
+                <div class="ChatBox js-Messaging">
                     <header class="ChatBox-header">
                         <h1 class="ChatBox-title"><span>Chat box</span></h1>
                     </header>
                     <div class="ChatBox-content">
-                        <div id="chatBoxMessages" class="ChatBoxMessage">
+                        <div id="chatBoxMessages" class="ChatBoxMessage js-MessagingMessageContainer">
                             Chargement en cours...
                             <!-- Pour l'exemple
                             <div class="ChatBoxMessage-message">
@@ -54,7 +69,7 @@
                     <div class="ChatBox-writeMessageContent">
                         <div class="ChatBox-writeMessage">
                             <form id="chatBoxForm" action="#">
-                                <input type="text" name="chatBoxWriteMessage" id="chatBoxWriteMessage" placeholder="Ecrivez votre message" />
+                                <input type="text" name="chatBoxWriteMessage" class="js-messagingFormWriteMessage" placeholder="Ecrivez votre message" />
                             </form>
                         </div>
                     </div>
