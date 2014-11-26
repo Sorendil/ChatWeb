@@ -61,7 +61,7 @@ var manageMessages = function( $messagesContainer, getMessages, blocMessageName,
         // Si on est en mode messagerie privée
         // et si le message reçu courant n'est pas un message de l'utilisateur actuel
         if ( privateMessagingWith &&
-            currentGetMessage.author != privateMessagingWith)
+            currentGetMessage.author != userPseudo)
         {
             lastTimeMessageReceived = currentGetMessage.time;
         }
@@ -200,6 +200,9 @@ var managePrivateMessagingMessages = function( data ) {
             if ( ( ! $pseudo.data( 'lastTimeMessageReceived' ) && lastTimeMessageReceived )
                 || ($pseudo.data( 'lastTimeMessageReceived' ) < lastTimeMessageReceived ) )
             {
+                console.log("Dans le IF");
+                console.log($pseudo.data( 'lastTimeMessageReceived' ));
+                console.log(lastTimeMessageReceived);
                 // On notifie que l'utilisateur a écrit un nouveau message
                 $pseudo.addClass('PseudoList-pseudoItem_new');
             }
