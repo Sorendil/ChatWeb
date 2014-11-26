@@ -23,7 +23,8 @@ $( document ).ready(function() {
     $chatBoxForm = $("#chatBoxForm");
     $chatBoxMessages = $("#chatBoxMessages");
     
-    console.log((new Date()).getTime());
+    // Container des messageries privées
+    $privateMessagingContainer = $("#privateMessagingContainer");
     
     // A l'envoi du formulaire
     $chatBoxForm.submit(function( event ) {
@@ -101,8 +102,13 @@ $( document ).ready(function() {
         });
     }, 4000);
     
-    // Container des messageries privées
-    $privateMessagingContainer = $("#privateMessagingContainer");
+    // =========== FERMETURE DES MESSAGERIES PRIVEES
+    
+    $privateMessagingContainer.on('click', '.js-PrivateMessaging .close', function(event) {
+        event.preventDefault();
+        
+        $(this).parents(".js-PrivateMessaging").remove();
+    });
     
     // Pour chaque pseudo, ouvrir une fenetre de discussion si elle n'est pas déjà ouverte
     // Note : Utilisation de on au lieu de click car un seul gestionnaire d'événement gère les écouteurs
@@ -125,7 +131,7 @@ $( document ).ready(function() {
         {
             // On ajoute une nouvelle messagerie privée correspondante !
             $newPrivateMessaging = $(
-                " <div class=\"Main-PrivateMessaging\">"
+                " <div class=\"Main-PrivateMessaging js-PrivateMessaging\">"
                 + "<div data-receiver=\"" + pseudoName + "\" class=\"PrivateMessaging\">"
                 
                 //header
@@ -154,11 +160,6 @@ $( document ).ready(function() {
                 + "</div>" //.PrivateMessaging
                 + "</div>" //.Main-PrivateMessaging
             );
-            
-            // Ici on utilise .click() au lieu de .on() car on cible un élément en particulier, et pas plusieurs.
-            $newPrivateMessaging.find("button.close").click(function() {
-                $newPrivateMessaging.remove();
-            });
             
             $privateMessagingContainer.append($newPrivateMessaging);
         }
