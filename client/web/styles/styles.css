@@ -84,16 +84,20 @@ button.close {
   margin: 0;
   padding: 0;
 }
+/* line 77, ../../sass/partials/global.scss */
+.Header-pseudo {
+  float: right;
+}
 
 /* Partial : Layout général */
-/* line 79, ../../sass/partials/global.scss */
+/* line 83, ../../sass/partials/global.scss */
 .Main {
   /* Grid container */
   /* Grid Chatbox container */
   /* Grid PseudoList container */
   /* Grid PrivateMessaging containers */
 }
-/* line 82, ../../sass/partials/global.scss */
+/* line 86, ../../sass/partials/global.scss */
 .Main-row {
   overflow: hidden;
   *zoom: 1;
@@ -107,21 +111,21 @@ button.close {
   display: block;
   clear: both;
 }
-/* line 88, ../../sass/partials/global.scss */
+/* line 92, ../../sass/partials/global.scss */
 .Main-ChatBox {
   width: 72.22222%;
   float: left;
   margin-left: 1.38889%;
   margin-right: 1.38889%;
 }
-/* line 93, ../../sass/partials/global.scss */
+/* line 97, ../../sass/partials/global.scss */
 .Main-PseudoList {
   width: 22.22222%;
   float: right;
   margin-left: 1.38889%;
   margin-right: 1.38889%;
 }
-/* line 98, ../../sass/partials/global.scss */
+/* line 102, ../../sass/partials/global.scss */
 .Main-PrivateMessaging {
   width: 47.22222%;
   float: left;
@@ -132,7 +136,7 @@ button.close {
 /* Mixin : Décrit un widget */
 /* Mixin : Espace pour écrire les messages */
 /* Widget de Chatbox */
-/* line 144, ../../sass/partials/global.scss */
+/* line 148, ../../sass/partials/global.scss */
 .ChatBox {
   -moz-box-shadow: #CCC 0 2px 10px;
   -webkit-box-shadow: #CCC 0 2px 10px;
@@ -140,7 +144,7 @@ button.close {
   margin-bottom: 20px;
   background-color: #FBFBFB;
 }
-/* line 109, ../../sass/partials/global.scss */
+/* line 113, ../../sass/partials/global.scss */
 .ChatBox-header {
   overflow: hidden;
   *zoom: 1;
@@ -152,29 +156,29 @@ button.close {
   background-image: linear-gradient(#d2cfac, #ecead5);
   border-bottom: 1px solid #d3d5b0;
 }
-/* line 114, ../../sass/partials/global.scss */
+/* line 118, ../../sass/partials/global.scss */
 .ChatBox-header button {
   margin-top: 5px;
   margin-right: 5px;
 }
-/* line 120, ../../sass/partials/global.scss */
+/* line 124, ../../sass/partials/global.scss */
 .ChatBox-title {
   margin: 0;
   padding: 0 10px;
   border-bottom: 3px solid #ecead5;
 }
-/* line 125, ../../sass/partials/global.scss */
+/* line 129, ../../sass/partials/global.scss */
 .ChatBox-title span {
   border-bottom: 4px solid #f3951b;
 }
-/* line 133, ../../sass/partials/global.scss */
+/* line 137, ../../sass/partials/global.scss */
 .ChatBox-writeMessageContent {
   background-color: #ecead5;
   padding: 5px;
 }
 
 /* Widget de selection du pseudo */
-/* line 150, ../../sass/partials/global.scss */
+/* line 154, ../../sass/partials/global.scss */
 .SelectPseudo {
   -moz-box-shadow: #CCC 0 2px 10px;
   -webkit-box-shadow: #CCC 0 2px 10px;
@@ -185,7 +189,7 @@ button.close {
   margin-left: auto;
   margin-right: auto;
 }
-/* line 109, ../../sass/partials/global.scss */
+/* line 113, ../../sass/partials/global.scss */
 .SelectPseudo-header {
   overflow: hidden;
   *zoom: 1;
@@ -197,22 +201,22 @@ button.close {
   background-image: linear-gradient(#d2cfac, #ecead5);
   border-bottom: 1px solid #d3d5b0;
 }
-/* line 114, ../../sass/partials/global.scss */
+/* line 118, ../../sass/partials/global.scss */
 .SelectPseudo-header button {
   margin-top: 5px;
   margin-right: 5px;
 }
-/* line 120, ../../sass/partials/global.scss */
+/* line 124, ../../sass/partials/global.scss */
 .SelectPseudo-title {
   margin: 0;
   padding: 0 10px;
   border-bottom: 3px solid #ecead5;
 }
-/* line 125, ../../sass/partials/global.scss */
+/* line 129, ../../sass/partials/global.scss */
 .SelectPseudo-title span {
   border-bottom: 4px solid #f3951b;
 }
-/* line 133, ../../sass/partials/global.scss */
+/* line 137, ../../sass/partials/global.scss */
 .SelectPseudo-writeMessageContent {
   background-color: #ecead5;
   padding: 5px;
@@ -223,14 +227,14 @@ button.close {
   display: block;
   clear: both;
 }
-/* line 155, ../../sass/partials/global.scss */
+/* line 159, ../../sass/partials/global.scss */
 .SelectPseudo p {
   padding: 5px;
   margin: 0;
 }
 
 /* Widget affichant la liste des pseudos */
-/* line 162, ../../sass/partials/global.scss */
+/* line 166, ../../sass/partials/global.scss */
 .PseudoList {
   -moz-box-shadow: #CCC 0 2px 10px;
   -webkit-box-shadow: #CCC 0 2px 10px;
@@ -238,7 +242,7 @@ button.close {
   margin-bottom: 20px;
   background-color: #FBFBFB;
 }
-/* line 109, ../../sass/partials/global.scss */
+/* line 113, ../../sass/partials/global.scss */
 .PseudoList-header {
   overflow: hidden;
   *zoom: 1;
@@ -250,22 +254,22 @@ button.close {
   background-image: linear-gradient(#d2cfac, #ecead5);
   border-bottom: 1px solid #d3d5b0;
 }
-/* line 114, ../../sass/partials/global.scss */
+/* line 118, ../../sass/partials/global.scss */
 .PseudoList-header button {
   margin-top: 5px;
   margin-right: 5px;
 }
-/* line 120, ../../sass/partials/global.scss */
+/* line 124, ../../sass/partials/global.scss */
 .PseudoList-title {
   margin: 0;
   padding: 0 10px;
   border-bottom: 3px solid #ecead5;
 }
-/* line 125, ../../sass/partials/global.scss */
+/* line 129, ../../sass/partials/global.scss */
 .PseudoList-title span {
   border-bottom: 4px solid #951bf3;
 }
-/* line 165, ../../sass/partials/global.scss */
+/* line 169, ../../sass/partials/global.scss */
 .PseudoList-list {
   list-style: none;
   margin: 0 10px;
@@ -277,15 +281,15 @@ button.close {
   list-style-type: none;
   margin-left: 0;
 }
-/* line 171, ../../sass/partials/global.scss */
+/* line 175, ../../sass/partials/global.scss */
 .PseudoList-pseudoItem {
   padding: 2px 0;
 }
-/* line 175, ../../sass/partials/global.scss */
+/* line 179, ../../sass/partials/global.scss */
 .PseudoList-pseudoItem_new .PseudoList-pseudo {
   color: #f3951b;
 }
-/* line 181, ../../sass/partials/global.scss */
+/* line 185, ../../sass/partials/global.scss */
 .PseudoList-pseudo {
   color: inherit;
   text-decoration: inherit;
@@ -297,13 +301,13 @@ button.close {
 .PseudoList-pseudo:active, .PseudoList-pseudo:focus {
   outline: none;
 }
-/* line 186, ../../sass/partials/global.scss */
+/* line 190, ../../sass/partials/global.scss */
 .PseudoList-pseudo:hover {
   color: #f3951b;
 }
 
 /* Widget de PrivateMessaging */
-/* line 193, ../../sass/partials/global.scss */
+/* line 197, ../../sass/partials/global.scss */
 .PrivateMessaging {
   -moz-box-shadow: #CCC 0 2px 10px;
   -webkit-box-shadow: #CCC 0 2px 10px;
@@ -311,7 +315,7 @@ button.close {
   margin-bottom: 20px;
   background-color: #FBFBFB;
 }
-/* line 109, ../../sass/partials/global.scss */
+/* line 113, ../../sass/partials/global.scss */
 .PrivateMessaging-header {
   overflow: hidden;
   *zoom: 1;
@@ -323,76 +327,76 @@ button.close {
   background-image: linear-gradient(#d2cfac, #ecead5);
   border-bottom: 1px solid #d3d5b0;
 }
-/* line 114, ../../sass/partials/global.scss */
+/* line 118, ../../sass/partials/global.scss */
 .PrivateMessaging-header button {
   margin-top: 5px;
   margin-right: 5px;
 }
-/* line 120, ../../sass/partials/global.scss */
+/* line 124, ../../sass/partials/global.scss */
 .PrivateMessaging-title {
   margin: 0;
   padding: 0 10px;
   border-bottom: 3px solid #ecead5;
 }
-/* line 125, ../../sass/partials/global.scss */
+/* line 129, ../../sass/partials/global.scss */
 .PrivateMessaging-title span {
   border-bottom: 4px solid #305763;
 }
-/* line 133, ../../sass/partials/global.scss */
+/* line 137, ../../sass/partials/global.scss */
 .PrivateMessaging-writeMessageContent {
   background-color: #ecead5;
   padding: 5px;
 }
 
 /* Styles des messages */
-/* line 225, ../../sass/partials/global.scss */
+/* line 229, ../../sass/partials/global.scss */
 .ChatBoxMessage {
   height: 300px;
   overflow-y: scroll;
 }
-/* line 203, ../../sass/partials/global.scss */
+/* line 207, ../../sass/partials/global.scss */
 .ChatBoxMessage-message {
   padding: 5px;
   border-style: solid;
   border-color: #d3d5b0;
   border-width: 0 0 1px;
 }
-/* line 210, ../../sass/partials/global.scss */
+/* line 214, ../../sass/partials/global.scss */
 .ChatBoxMessage:last-child {
   border-width: 0;
 }
-/* line 214, ../../sass/partials/global.scss */
+/* line 218, ../../sass/partials/global.scss */
 .ChatBoxMessage-author {
   color: #f3951b;
   font-weight: bold;
 }
-/* line 219, ../../sass/partials/global.scss */
+/* line 223, ../../sass/partials/global.scss */
 .ChatBoxMessage-content {
   margin-left: 5px;
 }
 
-/* line 230, ../../sass/partials/global.scss */
+/* line 234, ../../sass/partials/global.scss */
 .PrivateMessagingMessage {
   height: 200px;
   overflow-y: scroll;
 }
-/* line 203, ../../sass/partials/global.scss */
+/* line 207, ../../sass/partials/global.scss */
 .PrivateMessagingMessage-message {
   padding: 5px;
   border-style: solid;
   border-color: #d3d5b0;
   border-width: 0 0 1px;
 }
-/* line 210, ../../sass/partials/global.scss */
+/* line 214, ../../sass/partials/global.scss */
 .PrivateMessagingMessage:last-child {
   border-width: 0;
 }
-/* line 214, ../../sass/partials/global.scss */
+/* line 218, ../../sass/partials/global.scss */
 .PrivateMessagingMessage-author {
   color: #f3951b;
   font-weight: bold;
 }
-/* line 219, ../../sass/partials/global.scss */
+/* line 223, ../../sass/partials/global.scss */
 .PrivateMessagingMessage-content {
   margin-left: 5px;
 }

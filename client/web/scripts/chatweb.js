@@ -449,6 +449,8 @@ $( document ).ready(function() {
         $('.js-selectPseudoContainer').remove();
         // On active toutes les classes qui n'étaient pas affichés à cause de la demande
         $('.whenPseudo').removeClass('whenPseudo');
+        // On affiche connecté en tant que
+        $('.Header-pseudo').text('Connecté en tant que ' + userPseudo);
         // On lance la fonction principale
         main();
     }
