@@ -1,8 +1,9 @@
 body {
   background: repeat url("../images/bg.png");
-  color: #353132;
+  color: $base-color;
   padding: 0;
   margin: 0;
+  font-size: $font-size-base;
 }
 
 /* Text Input */
@@ -20,6 +21,35 @@ input[type='text'] {
   @include border-radius (.2em);
   border: 1px solid $border-color;
 }
+
+/* Boutons Close
+ * Code de bootstrap
+ */
+.close {
+  float: right;
+  font-size: ($font-size-base * 1.5);
+  font-weight: bold;
+  line-height: 1;
+  color: $base-color;
+  text-shadow: 0 1px 0 #fff;
+  @include opacity(.2);
+
+  &:hover,
+  &:focus {
+    color: $base-color;
+    text-decoration: none;
+    cursor: pointer;
+    @include opacity(.5);
+  }
+}
+button.close {
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  -webkit-appearance: none;
+}
+
 
 /* Partial : Header */
 .Header {
@@ -73,8 +103,14 @@ input[type='text'] {
   background-color: #FBFBFB;
    
   &-header {
+    @include clearfix(); // Pour la croix en flottant
     @include background-image(linear-gradient($gradient-color-top, $gradient-color-bottom));
     border-bottom: 1px solid $border-color;
+    
+    & button {
+      margin-top: 5px;
+      margin-right: 5px;
+    }
   }
   
   &-title {

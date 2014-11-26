@@ -124,15 +124,17 @@ $( document ).ready(function() {
         if ( ! $privateMessagings.length)
         {
             // On ajoute une nouvelle messagerie privée correspondante !
-            $privateMessagingContainer.append(
+            $newPrivateMessaging = $(
                 " <div class=\"Main-PrivateMessaging\">"
                 + "<div data-receiver=\"" + pseudoName + "\" class=\"PrivateMessaging\">"
                 
                 //header
                 + "<header class=\"PrivateMessaging-header\">"
+                + "<button type=\"button\" class=\"close\"><span aria-hidden=\"true\">&times;</span></button>"
                 + "<h1 class=\"PrivateMessaging-title\"><span>"
                 + pseudoName
-                + "</span></h1></header>"
+                + "</span></h1>"
+                + "</header>"
                 
                 //content
                 + "<div class=\"PrivateMessaging-content\">"
@@ -152,6 +154,13 @@ $( document ).ready(function() {
                 + "</div>" //.PrivateMessaging
                 + "</div>" //.Main-PrivateMessaging
             );
+            
+            // Ici on utilise .click() au lieu de .on() car on cible un élément en particulier, et pas plusieurs.
+            $newPrivateMessaging.find("button.close").click(function() {
+                $newPrivateMessaging.remove();
+            });
+            
+            $privateMessagingContainer.append($newPrivateMessaging);
         }
     });
     
