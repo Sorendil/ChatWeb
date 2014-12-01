@@ -15,6 +15,9 @@ var app = express();
 app.use(express.bodyParser());
 app.use(allowCrossDomain);
 
+// last active users
+//app.use(routes.registerPeople);
+
 // List of persons ressource
 app.get('/', routes.getAllPersons);
 app.put('/', routes.methodNotAllowed);
@@ -22,7 +25,8 @@ app.post('/', routes.methodNotAllowed);
 app.delete('/', routes.methodNotAllowed);
 
 // Message ressource
-app.get('/messages/:person', routes.getMessageFromPerson);
+app.get('/messages', routes.getAllMessages);
+app.get('/messages/:person', routes.getPersonsMessages);
 app.post('/messages/:person', routes.sendMessage);
 app.delete('/messages/:person', routes.deleteMessage);
 
