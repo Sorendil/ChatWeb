@@ -10,7 +10,6 @@ exports.getAllPersons = function(req, res) {
     models.Person.find(null, 'name', function(err, persons) {
         persons = persons.map(function(person) {
             person = person.toJSON();
-            person.url = '/' + person._id;
             return person;
         });
         res.send(persons);
@@ -132,7 +131,7 @@ exports.getPersonsMessages = function(req, res) {
                 docs.map( function (msg) {
                     
                     var sender =  (msg.author == person.name) ? msg.receiver : msg.author;
-                    msg.date = new mongoose.Types.ObjectId(msg._id).getTimestamp();
+                    msg.date = new mongoose.Types.ObjectId(msg._id).getTimestamp().getTime();
                     convo[sender] = convo[sender] || [] ;
                     convo[sender].push(msg);
 
@@ -166,7 +165,7 @@ exports.getPersonsMessages = function(req, res) {
 
             dcs = dcs.map(function(doc) {
                  //console.log(new mongoose.Types.ObjectId(doc._id).getTimestamp());
-                doc.date = new mongoose.Types.ObjectId(doc._id).getTimestamp();
+                doc.date = new mongoose.Types.ObjectId(doc._id).getTimestamp().getTime();
                 return doc;
             });
 

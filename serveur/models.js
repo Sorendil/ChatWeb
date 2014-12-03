@@ -7,7 +7,7 @@ var MessageSchema = new mongoose.Schema({
 	content: {type: String, required:true},
 	author : { type : String, required:true}, 
 	receiver : { type : String , default : null},
-	date : { type : Date }
+	date : { type : Number }
 });
 exports.Message = mongoose.model('Message', MessageSchema);
 
