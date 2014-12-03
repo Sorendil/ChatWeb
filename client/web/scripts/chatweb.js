@@ -256,11 +256,10 @@ var manageWriteMessages = function( event ) {
     $.ajax(api_root + "/messages/" + userPseudo, {
         type: "POST",
         data: dataMessage,
-        dataType: "json",
-        success: function() {alert("Success");}
-    })
-    .done(function( ){alert("OK");})
-    .fail(function( ){alert("FAIL");})
+        success: function() {
+            //alert("Success");
+        }
+    });
 };
 
 var main = function() {
