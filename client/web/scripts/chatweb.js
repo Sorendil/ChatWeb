@@ -247,14 +247,17 @@ var manageWriteMessages = function( event ) {
     // On envoie le message
     dataMessage = {
         content: messagingFormMessageContent,
-        author: userPseudo,
-        receiver: ( event.data.isPrivateMessaging ? $messagingBloc.find('[data-receiver]').data('receiver') : false )
+        author: userPseudo
     }
+    if (event.data.isPrivateMessaging)
+        dataMessage.receiver = $messagingBloc.find('[data-receiver]').data('receiver');
+        
     //console.log(dataMessage);
     $.ajax(api_root + "/messages/" + userPseudo, {
         type: "POST",
         data: dataMessage,
-        dataType: "json"
+        dataType: "json",
+        success: function() {alert("Success");}
     })
     .done(function( ){alert("OK");})
     .fail(function( ){alert("FAIL");})
