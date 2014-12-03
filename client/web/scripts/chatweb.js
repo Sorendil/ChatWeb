@@ -4,6 +4,7 @@
  */
  
 userPseudo = "";
+api_root = "http://localhost:1337"
 
 /**
  * Fonction scrollBottom
@@ -63,7 +64,7 @@ var manageMessages = function( $messagesContainer, getMessages, blocMessageName,
         if ( privateMessagingWith &&
             currentGetMessage.author != userPseudo)
         {
-            lastTimeMessageReceived = currentGetMessage.time;
+            lastTimeMessageReceived = currentGetMessage.date;
         }
         
         // Si il n'y a plus de messages existants
@@ -71,7 +72,7 @@ var manageMessages = function( $messagesContainer, getMessages, blocMessageName,
         {
             // on ajoute les messages entrants à la suite
             $messagesContainer.append(
-                "<div data-message-time=\"" + currentGetMessage.time + "\" data-message-id=\"" + currentGetMessage.id + "\" class=\"" + blocMessageName + "-message\">"
+                "<div data-message-time=\"" + currentGetMessage.date + "\" data-message-id=\"" + currentGetMessage._id + "\" class=\"" + blocMessageName + "-message\">"
                 + "<div class=\"" + blocMessageName + "-author\">"
                 + currentGetMessage.author
                 + "</div>"
@@ -95,7 +96,7 @@ var manageMessages = function( $messagesContainer, getMessages, blocMessageName,
             {
                 // Si le message existant et le message entrant courant est le meme
                 if ( $existingMessages.eq(currentIdExistingMessage).data( "messageId" )
-                == currentGetMessage.id )
+                == currentGetMessage._id )
                 {
                     // Alors on a rien à faire pour ces deux messages
                     // et on avance le curseur des messages existants
@@ -104,7 +105,7 @@ var manageMessages = function( $messagesContainer, getMessages, blocMessageName,
                     currentIdGetMessage++;
                 }
                 // Si le message existant courant est plus vieux que le message récupéré courant
-                else if ( $existingMessages.eq(currentIdExistingMessage).data( "messageTime" ) <= currentGetMessage.time )
+                else if ( $existingMessages.eq(currentIdExistingMessage).data( "messageTime" ) <= currentGetMessage.date )
                 {
                     // Alors on avance le curseur des messages existants
                     currentIdExistingMessage++;
@@ -113,7 +114,7 @@ var manageMessages = function( $messagesContainer, getMessages, blocMessageName,
                 else
                 {
                     $existingMessages.eq(currentIdExistingMessage).before(
-                        "<div data-message-time=\"" + currentGetMessage.time + "\" data-message-id=\"" + currentGetMessage.id + "\" class=\"" + blocMessageName + "-message\">"
+                        "<div data-message-time=\"" + currentGetMessage.date + "\" data-message-id=\"" + currentGetMessage._id + "\" class=\"" + blocMessageName + "-message\">"
                         + "<div class=\"" + blocMessageName + "-author\">"
                         + currentGetMessage.author
                         + "</div>"
@@ -138,14 +139,14 @@ var getLastTimeMessageReceived = function( getMessages, receiver )
 {
     // Temps du dernier message reçu
     lastTimeMessageReceived = null;
-    
+    //console.log(getMessages);
     // Pour chaque message reçu
     $.each( getMessages, function( key, getMessage ) {
         if ( receiver != getMessage.author )
         {
-            console.log(receiver);
-            console.log(getMessage.author);
-            lastTimeMessageReceived = getMessage.time;
+            //console.log(receiver);
+            //console.log(getMessage.author);
+            lastTimeMessageReceived = getMessage.date;
         }
     });
     
@@ -157,7 +158,7 @@ var getLastTimeMessageReceived = function( getMessages, receiver )
  */
 var manageChatBoxMessages = function( data ) {
     // La liste des messages de la chatbox
-    chatBoxMessages = data.chatbox.messages;
+    chatBoxMessages = data.chatroom;
     
     manageMessages( $chatBoxMessages, chatBoxMessages, "ChatBoxMessage", false );
 };
@@ -167,12 +168,12 @@ var manageChatBoxMessages = function( data ) {
  */
 var managePrivateMessagingMessages = function( data ) {
     // La liste des différentes fils de discussion
-    privateRooms = data.privateRooms;
+    privateRooms = data.privatebox;
     
     // Pour chaque Messagerie Privée
     $.each( privateRooms, function( key, privateRoom ) {
         // La liste des messages récupérés pour la messagerie privée courante
-        privateRoomMessages = privateRoom.messages;
+        privateRoomMessages = privateRoom.msgs;
         
         // Le pseudo
         pseudoName = privateRoom.receiver;
@@ -194,15 +195,12 @@ var managePrivateMessagingMessages = function( data ) {
         {
             lastTimeMessageReceived = getLastTimeMessageReceived( privateRoomMessages, userPseudo );
             
-            console.log(lastTimeMessageReceived);
+            //console.log(lastTimeMessageReceived);
             
             // Si l'ancien temps du message reçu est plus vieux que le nouveau
             if ( ( ! $pseudo.data( 'lastTimeMessageReceived' ) && lastTimeMessageReceived )
                 || ($pseudo.data( 'lastTimeMessageReceived' ) < lastTimeMessageReceived ) )
             {
-                console.log("Dans le IF");
-                console.log($pseudo.data( 'lastTimeMessageReceived' ));
-                console.log(lastTimeMessageReceived);
                 // On notifie que l'utilisateur a écrit un nouveau message
                 $pseudo.addClass('PseudoList-pseudoItem_new');
             }
@@ -229,7 +227,7 @@ var manageWriteMessages = function( event ) {
     // Le input du message
     $messagingFormMessageInput = $(this).find(".js-messagingFormWriteMessage");
     
-    console.log($messagingFormMessageInput);
+    //console.log($messagingFormMessageInput);
     
     // Le contenu du message
     messagingFormMessageContent = $messagingFormMessageInput.val();
@@ -250,10 +248,10 @@ var manageWriteMessages = function( event ) {
     dataMessage = {
         content: messagingFormMessageContent,
         author: userPseudo,
-        target: ( event.data.isPrivateMessaging ? $messagingBloc.find('[data-receiver]').data('receiver') : false )
+        receiver: ( event.data.isPrivateMessaging ? $messagingBloc.find('[data-receiver]').data('receiver') : false )
     }
-    console.log(dataMessage);
-    $.ajax("tests/writeMessage.json", {
+    //console.log(dataMessage);
+    $.ajax(api_root + "/messages/" + userPseudo, {
         type: "POST",
         data: dataMessage,
         dataType: "json"
@@ -327,7 +325,7 @@ var main = function() {
             
         })
         .fail( function(data) {
-            console.log("fichier non charge");
+            console.log("Informations non recuperees");
         });
     }, 4000);
     
@@ -412,7 +410,7 @@ var main = function() {
     
     // Récupération des messages toutes les 5 secondes
     setInterval(function(){
-        $.ajax("tests/messages.json", {
+        $.ajax(api_root + "/messages/" + userPseudo, {
             dataType: "json"
         })
         .done( function( data ){
@@ -420,7 +418,7 @@ var main = function() {
             managePrivateMessagingMessages( data );
         })
         .fail( function(data) {
-            console.log("fichier non charge");
+            console.log("Informations non recuperees");
         });
     }, 2000);
 };
