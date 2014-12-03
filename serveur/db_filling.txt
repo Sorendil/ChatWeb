@@ -1,0 +1,86 @@
+db.people.insert({
+
+'_id' : 'antho',
+'name' : 'antho'
+});
+
+
+db.people.insert({
+
+'_id' : 'kev',
+'name' : 'kev'
+});
+
+
+db.people.insert({
+
+'_id' : 'joh',
+'name' : 'joh'
+});
+
+
+db.people.insert({
+
+'_id' : 'seb',
+'name' : 'seb'
+});
+
+db.people.insert({
+
+'_id' : 'stef',
+'name' : 'stef'
+});
+
+
+db.messages.insert({
+'content' : 'hey ça va?',
+'author' : 'joh',
+'receiver' : 'kev'
+
+});
+
+db.messages.insert({
+'content' : 'oui et toi',
+'author' : 'kev',
+'receiver' : 'joh'
+});
+
+
+db.messages.insert({
+'content' : 'ça va très bien merci!',
+'author' : 'joh',
+'receiver' : 'kev'
+});
+
+
+db.messages.insert({
+'content' : 'hi everyone ',
+'author' : 'kev'
+});
+
+db.messages.insert({
+'content' : 'wassup?',
+'author' : 'seb'
+});
+
+
+db.messages.insert({
+'content' : 'im doing good',
+'author' : 'stef'
+});
+
+db.messages.insert({
+'content' : 'yeeeah',
+'author' : 'joh'
+});
+
+
+
+
+
+
+
+
+
+
+
