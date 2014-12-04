@@ -235,6 +235,11 @@ var managePrivateMessagingMessages = function( data ) {
 var managePseudosList = function( data ) {
     // La liste des pseudos
     pseudos = data.connected;
+    
+    if ( ! pseudos )
+    {
+        pseudos = [];
+    }
 
     // La liste des pseudos existants déjà dans le DOM
     $existingPseudos = $pseudoList.find('.js-PseudoList-pseudo');
@@ -339,7 +344,11 @@ var pollingNetworkMode = function() {
         if( networkMode == 0 )
         {
             $.ajax(api_root + "/messages/" + userPseudo, {
-            dataType: "json"
+                dataType: "json",
+                data: {
+                    networkMode: networkMode
+                }
+            
             })
             .done( function( data ){
                 manageResponse( data );
