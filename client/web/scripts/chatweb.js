@@ -395,12 +395,26 @@ var main = function() {
     });
     
     var k = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65],  
-        n = 0; 
+        n = 0,
+        lastKnmImage = -1; 
+        
     $(document).keydown(function (e) {  
         if (e.keyCode === k[n++]) {  
             if (n === k.length) {
-                var randomnumber = Math.floor(Math.random() * (7 + 1));
-                $(".Main .Main-row:first").prepend("<img src=\"images/knm/" + randomnumber + ".gif\" ∕>");
+                randomnumber = Math.floor(Math.random() * (7 + 1));
+                while ( lastKnmImage === randomnumber )
+                {
+                    randomnumber = Math.floor(Math.random() * (7 + 1));
+                }
+                lastKnmImage = randomnumber;
+                console.log(randomnumber);
+                $knmImg = $('.js-knm');
+                if ( ! $knmImg.length)
+                {
+                    $(".Main .Main-row:first").prepend("<img class=\"js-knm\" ∕>");
+                    $knmImg = $('.js-knm');
+                }
+                $knmImg.attr('src', 'images/knm/' + randomnumber + '.gif');
                 n = 0;
                 return !1  
             }  
