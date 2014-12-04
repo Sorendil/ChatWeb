@@ -6,6 +6,17 @@
 userPseudo = "";
 api_root = "http://localhost:1337"
 
+// Le <input> d'envoi de messages pour la Chatbox
+var $chatBoxWriteMessage;
+var $chatBoxForm;
+var $chatBoxMessages;
+
+// Container des messageries privées
+var $privateMessagingContainer;
+
+// ======== PSEUDO LIST
+var $pseudoList;
+
 /**
  * Fonction scrollBottom
  */
@@ -212,6 +223,43 @@ var managePrivateMessagingMessages = function( data ) {
     });
 };
 
+var managePseudosList = function( data ) {
+    // La liste des pseudos
+    pseudos = data.connected;
+
+    // La liste des pseudos existants déjà dans le DOM
+    $existingPseudos = $pseudoList.find('.js-PseudoList-pseudo');
+    $existingPseudos.data("seen", false);
+
+    // Pour enlever le Chargement en cours
+    if ( ! $existingPseudos.length )
+    {
+        $pseudoList.empty();
+    }
+
+    // Pour chaque pseudo
+    $.each( pseudos, function( key, pseudo ) {
+        // On cherche si le pseudo est déjà dans le DOM
+        $existingPseudo = $existingPseudos.filter('[data-pseudo=\"' + pseudo.name + '\"]');
+        
+        // Si il n'a pas été trouvé
+        if ( ! $existingPseudo.length && pseudo.name != userPseudo )
+        {
+            $newPseudo = $("<li data-pseudo=\"" + pseudo.name + "\" class=\"PseudoList-pseudoItem js-PseudoList-pseudo\">"
+                + "<a class=\"PseudoList-pseudo\" href=\"#\">"
+                + pseudo.name
+                + "</a></li>");
+            $newPseudo.data("seen", "true");
+            $pseudoList.append($newPseudo);
+        }
+        $existingPseudo.data("seen", "coucou");
+    });
+    // On supprime tous les pseudos qui n'ont pas été trouvés
+    $existingPseudos.filter(function() { 
+      return $(this).data("seen") == false 
+    }).remove();
+}
+
 /**
  * Gestionnaire d'événements des envois de messages
  * @param event.target : Cible un formulaire <form>
@@ -267,7 +315,6 @@ var main = function() {
     // ====================
     
     // ======= CHAT BOX
-    
     // Le <input> d'envoi de messages pour la Chatbox
     $chatBoxWriteMessage = $("#chatBoxWriteMessage");
     $chatBoxForm = $("#chatBoxForm");
@@ -276,60 +323,13 @@ var main = function() {
     // Container des messageries privées
     $privateMessagingContainer = $("#privateMessagingContainer");
     
+    
     // Gestion des événements des envois de messages
     $chatBoxForm.on("submit", { isPrivateMessaging: false }, manageWriteMessages);
     $privateMessagingContainer.on("submit", '.js-messagingForm', { isPrivateMessaging: true }, manageWriteMessages);
     
     // ======== PSEUDO LIST
     $pseudoList = $("#pseudoList");
-    
-    // Récupération des pseudos toutes les 5 secondes
-    setInterval(function(){
-        $.ajax(api_root + "/messages/" + userPseudo, {
-            dataType: "json"
-        })
-        .done( function( data ){
-        
-            // La liste des pseudos
-            pseudos = data.connected;
-            
-            // La liste des pseudos existants déjà dans le DOM
-            $existingPseudos = $pseudoList.find('.js-PseudoList-pseudo');
-            $existingPseudos.data("seen", false);
-            
-            // Pour enlever le Chargement en cours
-            if ( ! $existingPseudos.length )
-            {
-                $pseudoList.empty();
-            }
-            
-            // Pour chaque pseudo
-            $.each( pseudos, function( key, pseudo ) {
-                // On cherche si le pseudo est déjà dans le DOM
-                $existingPseudo = $existingPseudos.filter('[data-pseudo=\"' + pseudo.name + '\"]');
-                
-                // Si il n'a pas été trouvé
-                if ( ! $existingPseudo.length && pseudo.name != userPseudo )
-                {
-                    $newPseudo = $("<li data-pseudo=\"" + pseudo.name + "\" class=\"PseudoList-pseudoItem js-PseudoList-pseudo\">"
-                        + "<a class=\"PseudoList-pseudo\" href=\"#\">"
-                        + pseudo.name
-                        + "</a></li>");
-                    $newPseudo.data("seen", "true");
-                    $pseudoList.append($newPseudo);
-                }
-                $existingPseudo.data("seen", "coucou");
-            });
-            // On supprime tous les pseudos qui n'ont pas été trouvés
-            $existingPseudos.filter(function() { 
-              return $(this).data("seen") == false 
-            }).remove();
-            
-        })
-        .fail( function(data) {
-            console.log("Informations non recuperees");
-        });
-    }, 4000);
     
     // =========== FERMETURE DES MESSAGERIES PRIVEES
     
@@ -432,6 +432,7 @@ var main = function() {
         .done( function( data ){
             manageChatBoxMessages( data );
             managePrivateMessagingMessages( data );
+            managePseudosList( data );
         })
         .fail( function(data) {
             console.log("Informations non recuperees");
