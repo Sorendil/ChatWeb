@@ -17,6 +17,10 @@ var $privateMessagingContainer;
 // ======== PSEUDO LIST
 var $pseudoList;
 
+// Refresh Feedback Image
+var refreshFeedbackImg = 0;
+var $refreshImage;
+
 /**
  * Fonction scrollBottom
  */
@@ -310,6 +314,15 @@ var manageWriteMessages = function( event ) {
     });
 };
 
+var refreshFeedback = function() {
+    $refreshImage.attr('src', 'images/refreshIcons/' + refreshFeedbackImg + '.png');
+    $refreshImage.show( 0 );
+    $refreshImage.delay( 500 ).hide( 0 );
+    
+    refreshFeedbackImg++;
+    if (refreshFeedbackImg > 16) refreshFeedbackImg = 0;
+}
+
 var main = function() {
     // ======== DONNEES
     // ====================
@@ -323,6 +336,8 @@ var main = function() {
     // Container des messageries privées
     $privateMessagingContainer = $("#privateMessagingContainer");
     
+    // Image refresh feedback
+    $refreshImage = $('.js-rf');
     
     // Gestion des événements des envois de messages
     $chatBoxForm.on("submit", { isPrivateMessaging: false }, manageWriteMessages);
@@ -433,6 +448,7 @@ var main = function() {
             manageChatBoxMessages( data );
             managePrivateMessagingMessages( data );
             managePseudosList( data );
+            refreshFeedback();
         })
         .fail( function(data) {
             console.log("Informations non recuperees");

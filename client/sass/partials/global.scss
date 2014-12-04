@@ -26,6 +26,13 @@ input[type='text'] {
   border: 1px solid $border-color;
 }
 
+.RefreshFeedback {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: none;
+}
+
 /* Boutons Close
  * Code de bootstrap
  */
