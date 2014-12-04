@@ -79,6 +79,27 @@ button.close {
   &-menu {
     margin: 0;
     padding: 0;
+    float: right;
+    
+    list-style-type: none;
+    
+    li {
+      display: inline;
+      margin-left: 15px;
+      
+      a {
+        display: inline-block;
+        border: 1px solid $border-color;
+        font-weight: bold;
+        padding: 2px;
+        text-decoration: none;
+        color: $base-color;
+        
+        &.active {
+          color: $link-color-active;
+        }
+      }
+    }
   }
   
   &-pseudo {

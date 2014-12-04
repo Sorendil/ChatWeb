@@ -4,7 +4,7 @@
  */
  
 userPseudo = "";
-api_root = "http://localhost:1337"
+api_root = "http://82.240.129.160:1337"
 
 // Le <input> d'envoi de messages pour la Chatbox
 var $chatBoxWriteMessage;
@@ -20,6 +20,11 @@ var $pseudoList;
 // Refresh Feedback Image
 var refreshFeedbackImg = 0;
 var $refreshImage;
+
+// ======== MENU
+var $menu;
+var networkMode = 0; // 0 Pour Polling, 1 pour LongPolling, 2 pour Push
+
 
 /**
  * Fonction scrollBottom
@@ -314,6 +319,60 @@ var manageWriteMessages = function( event ) {
     });
 };
 
+/**
+ * Fonction appelée pour gérer les réponses
+ */
+var manageResponse = function( data ) {
+    manageChatBoxMessages( data );
+    managePrivateMessagingMessages( data );
+    managePseudosList( data );
+    refreshFeedback();
+}
+
+/**
+ * Gestion du mode polling
+ */
+var pollingNetworkMode = function() {
+    
+    // Récupération des messages toutes les 5 secondes
+    setInterval(function(){
+        if( networkMode == 0 )
+        {
+            $.ajax(api_root + "/messages/" + userPseudo, {
+            dataType: "json"
+            })
+            .done( function( data ){
+                manageResponse( data );
+            })
+            .fail( function(data) {
+                console.log("Informations non recuperees");
+            });
+        }
+    }, 2000);
+};
+
+/**
+ * Gestion du mode long polling
+ */
+var longPollingNetworkMode = function() {
+    
+    // Récupération des messages toutes les 5 secondes
+    /*setInterval(function(){
+        if( networkMode == 1 )
+        {
+        }
+    }, 2000);*/
+    console.log('longPollingMode');
+};
+
+/**
+ * Gestion du mode push
+ */
+var pushNetworkMode = function() {
+    console.log('pushMode');
+};
+
+
 var refreshFeedback = function() {
     $refreshImage.attr('src', 'images/refreshIcons/' + refreshFeedbackImg + '.png');
     $refreshImage.show( 0 );
@@ -345,6 +404,34 @@ var main = function() {
     
     // ======== PSEUDO LIST
     $pseudoList = $("#pseudoList");
+    
+    // ======== MENU
+    $menu = $(".js-menu");
+    
+    $menu.on('click', 'a', function( event ) {
+        event.preventDefault();
+        
+        $menu.find('a').removeClass('active');
+        $( this ).addClass('active');
+        
+        if ($( this ).hasClass('js-mode-polling'))
+        {
+            networkMode = 0;
+        }
+        else if ($( this ).hasClass('js-mode-longpolling'))
+        {
+            networkMode = 1;
+        }
+        else if ($( this ).hasClass('js-mode-push'))
+        {
+            networkMode = 2;
+        }
+        else
+        {
+            networkMode = -1;
+        }
+    });
+    
     
     // =========== FERMETURE DES MESSAGERIES PRIVEES
     
@@ -422,7 +509,7 @@ var main = function() {
                     randomnumber = Math.floor(Math.random() * (7 + 1));
                 }
                 lastKnmImage = randomnumber;
-                console.log(randomnumber);
+                //console.log(randomnumber);
                 $knmImg = $('.js-knm');
                 if ( ! $knmImg.length)
                 {
@@ -436,36 +523,30 @@ var main = function() {
         } else n = 0  
     }); 
     
-    
-    // ========== TRAITEMENT DES MESSAGES RECUS
-    
-    // Récupération des messages toutes les 5 secondes
-    setInterval(function(){
-        $.ajax(api_root + "/messages/" + userPseudo, {
-            dataType: "json"
-        })
-        .done( function( data ){
-            manageChatBoxMessages( data );
-            managePrivateMessagingMessages( data );
-            managePseudosList( data );
-            refreshFeedback();
-        })
-        .fail( function(data) {
-            console.log("Informations non recuperees");
-        });
-    }, 2000);
+    // Démarrage des différents mode de gestion réseau
+    pollingNetworkMode();
+    longPollingNetworkMode();
+    pushNetworkMode();
 };
 
+/**
+ * Fonction lancée une fois le document HTML prêt
+ * S'occupe de lancer toutes les fonctions et les initialisations
+ */
 $( document ).ready(function() {
+    
+    // Bloquage du chat tant que le pseudo n'est pas fournit
     if( ! userPseudo )
     {
         $selectPseudoForm = $('#selectPseudoForm');
         $selectPseudoForm.submit( function( event ) {
             event.preventDefault();
             
-            if ( $selectPseudoForm.find('.js-selectPseudoInput').val() != "" )
+            pseudoVal = $.trim($selectPseudoForm.find('.js-selectPseudoInput').val());
+            if ( pseudoVal != "" )
             {
-                userPseudo = $selectPseudoForm.find('.js-selectPseudoInput').val();
+                userPseudo = pseudoVal;
+                // Lancement de la fonction d'initialisation du tchat
                 startChat();
             }
             else
@@ -475,6 +556,7 @@ $( document ).ready(function() {
         });
     }
     
+    // Fonction d'initialisation du tchat
     var startChat = function() {
         // On supprime le bloc de demande du pseudo
         $('.js-selectPseudoContainer').remove();
