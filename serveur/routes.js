@@ -1,4 +1,5 @@
 var models = require('./models.js');
+var start = require('./start.js');
 var mongoose = require('mongoose');
 var mongodb = require('mongodb');
 
@@ -108,76 +109,121 @@ exports.getMessage = function(req, res) {
 };
 
 exports.getPersonsMessages = function(req, res) {
-    registerPeople(req);
-    var slug = req.params.person;
-    var bundle = {chatroom : [] , privatebox : [] } ;
-    models.Person.findById(slug, function(err, person) {
-        if (person === null) {
-            res.send(404, 'Person not found');
-        }
-        
-         var privatebox_messages =  models.Message.find( { 
-            receiver : { $ne : null  },  
-            $or: [  {receiver : person} , {author : person  } ]
-            
-            },function (err,docs){
+    var con ;
 
+    var db = start.db;
+    var collection = db.collection('active');
+    collection.find().toArray(function(err,results){
+        if(err){
+            console.log("fuck it");
+        }
+
+        con =  results;
+    });
+   
+    var collection = db.collection('active');
+        var gift = new Object();
+        var nb ;
+
+    /* vérifier que le nom n'est pas déjà présent dans la liste des connectés
+        la collection est limité à 10 personnes 
+    */
+    collection.count({ name : req.params.person },function (err, nbdocs){
+        if (req.params.person != null && nbdocs < 1) {
+            console.log(req.params.person);
+            gift.name = req.params.person;
+
+            collection.insert(gift,function(err, records){
+                if(err)
+                    console.log(err);
+                
+            });
+        }
+    });
+
+    
+    var slug = req.params.person;
+    var bundle = {chatroom : [] , privatebox : [], connected : [] } ;
+    models.Person.findById(slug, function(err, person) {
+        // si l'utisateur n'existe pas on le crée
+        if (person === null) {
+            var p = new models.Person();
+            p._id = req.params.person;
+            p.name = req.params.person;
+            p.save(function(err){
+                if(err){
+                    console.log("user creation failed");
+                    res.send(500,"you got screwed dude");
+                }
+                else{
+                    res.send(201,bundle);
+                    console.log("OK user created");
+                }
+            });
+            
+        }
+
+        else{        
+        // Sinon
+            var privatebox_messages =  models.Message.find( { 
+                receiver : { $ne : null  },  
+                $or: [  {receiver : person} , {author : person  } ]
+            
+                },function (err,docs){
+
+                    if (err) {
+                        res.send(500, err);
+                    }
+
+                    var convo = [];
+
+                    docs.map( function (msg) {
+                    
+                        var sender =  (msg.author == person.name) ? msg.receiver : msg.author;
+                        msg.date = new mongoose.Types.ObjectId(msg._id).getTimestamp().getTime();
+                        convo[sender] = convo[sender] || [] ;
+                        convo[sender].push(msg);  
+
+                    }) ;
+              
+               
+                    //console.log(bundle.privatebox);
+                    var tab_convo = []
+                    for( var p in convo){
+                    var conv = new Object();
+                    conv.receiver = p;
+                    conv.msgs = [];
+                    conv.msgs = convo[p];
+                    tab_convo.push(conv);
+                    }
+
+                    //console.log(tab_convo);
+                    bundle.privatebox = tab_convo;
+              
+                });
+
+
+
+            var chatbox_messages =  models.Message.find( {  receiver : null},function (err, dcs) {
                 if (err) {
                     res.send(500, err);
                 }
 
-                var convo = [];
+                dcs = dcs.map(function(doc) {
+                    //console.log(new mongoose.Types.ObjectId(doc._id).getTimestamp());
+                    doc.date = new mongoose.Types.ObjectId(doc._id).getTimestamp().getTime();
+                    return doc;
+                });
 
-                docs.map( function (msg) {
-                    
-                    var sender =  (msg.author == person.name) ? msg.receiver : msg.author;
-                    msg.date = new mongoose.Types.ObjectId(msg._id).getTimestamp().getTime();
-                    convo[sender] = convo[sender] || [] ;
-                    convo[sender].push(msg);
-
-                   
-                   convo  
-
-                }) ;
-              
-               
-                //console.log(bundle.privatebox);
-                var tab_convo = []
-                for( var p in convo){
-                var conv = new Object();
-                conv.receiver = p;
-                conv.msgs = [];
-                conv.msgs = convo[p];
-                tab_convo.push(conv);
-                }
-
-                //console.log(tab_convo);
-                bundle.privatebox = tab_convo;
-              
+                bundle.connected = con;
+                bundle.chatroom = dcs;
+                console.log(" connecte "+ con);
+                //console.log(bundle);
+                res.send(200, bundle);
             });
-
-
-
-        var chatbox_messages =  models.Message.find( {  receiver : null},function (err, dcs) {
-            if (err) {
-                res.send(500, err);
-            }
-
-            dcs = dcs.map(function(doc) {
-                 //console.log(new mongoose.Types.ObjectId(doc._id).getTimestamp());
-                doc.date = new mongoose.Types.ObjectId(doc._id).getTimestamp().getTime();
-                return doc;
-            });
-
-
-            bundle.chatroom = dcs;
-
-           //console.log(bundle);
-            res.send(200, bundle);
-            });
-        
+        }
     
-    });
+    });  
 };
 
 
@@ -212,7 +258,7 @@ exports.setMessage = function(req, res) {
 
 exports.sendMessage = function(req, res) {
     var slug = req.params.person;
-    registerPeople(req);
+    
     models.Person.findById(slug, function(err, person) {
         if (person === null) {
             res.send(404, 'Not found');
@@ -292,37 +338,5 @@ exports.createComment = function(req, res) {
 
 
 
-function registerPeople  (req){
-    mongodb.connect("mongodb://localhost/test", function(err, db) {
-        if(err) { 
-            return console.dir(err); 
-        } 
-    
-    
-        var collection = db.collection('active');
-        var gift = new Object();
-        var nb ;
-
-        /* vérifier que le nom n'est pas déjà présent dans la liste des connectés
-            la collection est limité à 10 personnes 
-        */
-        collection.count({ name : req.params.person },function (err, nbdocs){
-              if (req.params.person != null && nbdocs < 1) {
-            console.log(req.params.person);
-            gift.name = req.params.person;
-
-            collection.insert(gift,function(err, records){
-                if(err)
-                    console.log(err);
-                
-            });
-        }
 
 
-        }); 
-
-      
-    
-        
-    });
-}
