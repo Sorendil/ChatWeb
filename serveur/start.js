@@ -1,6 +1,20 @@
 var express = require('express');
-
+var mongodb = require('mongodb');
 var models = require('./models.js');
+
+
+
+mongodb.connect("mongodb://localhost/test", function(err, db) {
+	if(err) { 
+		return console.dir(err); 
+	}
+
+	
+	exports.db = db;
+});
+
+
+
 var routes = require('./routes.js');
 
 var allowCrossDomain = function(req, res, next) {
@@ -10,6 +24,9 @@ var allowCrossDomain = function(req, res, next) {
 
     next();
 };
+
+
+
 
 var app = express();
 app.use(express.bodyParser());

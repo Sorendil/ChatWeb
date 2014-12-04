@@ -286,13 +286,13 @@ var main = function() {
     
     // Récupération des pseudos toutes les 5 secondes
     setInterval(function(){
-        $.ajax("tests/pseudoList.json", {
+        $.ajax(api_root + "/messages/" + userPseudo, {
             dataType: "json"
         })
         .done( function( data ){
         
             // La liste des pseudos
-            pseudos = data.pseudos;
+            pseudos = data.connected;
             
             // La liste des pseudos existants déjà dans le DOM
             $existingPseudos = $pseudoList.find('.js-PseudoList-pseudo');
@@ -307,14 +307,14 @@ var main = function() {
             // Pour chaque pseudo
             $.each( pseudos, function( key, pseudo ) {
                 // On cherche si le pseudo est déjà dans le DOM
-                $existingPseudo = $existingPseudos.filter('[data-pseudo=\"' + pseudo + '\"]');
+                $existingPseudo = $existingPseudos.filter('[data-pseudo=\"' + pseudo.name + '\"]');
                 
                 // Si il n'a pas été trouvé
-                if ( ! $existingPseudo.length && pseudo != userPseudo )
+                if ( ! $existingPseudo.length && pseudo.name != userPseudo )
                 {
-                    $newPseudo = $("<li data-pseudo=\"" + pseudo + "\" class=\"PseudoList-pseudoItem js-PseudoList-pseudo\">"
+                    $newPseudo = $("<li data-pseudo=\"" + pseudo.name + "\" class=\"PseudoList-pseudoItem js-PseudoList-pseudo\">"
                         + "<a class=\"PseudoList-pseudo\" href=\"#\">"
-                        + pseudo
+                        + pseudo.name
                         + "</a></li>");
                     $newPseudo.data("seen", "true");
                     $pseudoList.append($newPseudo);
