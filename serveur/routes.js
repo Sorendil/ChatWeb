@@ -2,6 +2,7 @@ var models = require('./models.js');
 var start = require('./start.js');
 var mongoose = require('mongoose');
 var mongodb = require('mongodb');
+var EventEmitter = require("events").EventEmitter;
 
 exports.methodNotAllowed = function(req, res) {
     res.send(405, 'Method not allowed');
@@ -107,21 +108,38 @@ exports.getMessage = function(req, res) {
         }
     });
 };
-
+   
 exports.getPersonsMessages = function(req, res) {
     var con ;
-
     var db = start.db;
     var collection = db.collection('active');
     collection.find().toArray(function(err,results){
         if(err){
             console.log("fuck it");
         }
+        // si le mode choisit est polling
+        if (req.headers.networkmode == 0) {
+            getMessages(req.params.person,res,results);
+        }
+        // mode long polling
+        else if(req.headers.networkmode == 1 ){
+            // bundle contenant la requête qui est en suspend et les personnes actives
+            var rep = { author : req.params.person ,resp : res  , con : results  };
+            start.requests.push(rep);
+            
+            start.emitter.on(req.params.person,getMessages);
+          
+        }
+        // mode push
+        else{
+            console.log("mode push");
+        }
 
         con =  results;
+
     });
    
-    var collection = db.collection('active');
+   
         var gift = new Object();
         var nb ;
 
@@ -141,89 +159,8 @@ exports.getPersonsMessages = function(req, res) {
         }
     });
 
-    
-    var slug = req.params.person;
-    var bundle = {chatroom : [] , privatebox : [], connected : [] } ;
-    models.Person.findById(slug, function(err, person) {
-        // si l'utisateur n'existe pas on le crée
-        if (person === null) {
-            var p = new models.Person();
-            p._id = req.params.person;
-            p.name = req.params.person;
-            p.save(function(err){
-                if(err){
-                    console.log("user creation failed");
-                    res.send(500,"you got screwed dude");
-                }
-                else{
-                    res.send(201,bundle);
-                    console.log("OK user created");
-                }
-            });
-            
-        }
+   
 
-        else{        
-        // Sinon
-            var privatebox_messages =  models.Message.find( { 
-                receiver : { $ne : null  },  
-                $or: [  {receiver : person} , {author : person  } ]
-            
-                },function (err,docs){
-
-                    if (err) {
-                        res.send(500, err);
-                    }
-
-                    var convo = [];
-
-                    docs.map( function (msg) {
-                    
-                        var sender =  (msg.author == person.name) ? msg.receiver : msg.author;
-                        msg.date = new mongoose.Types.ObjectId(msg._id).getTimestamp().getTime();
-                        convo[sender] = convo[sender] || [] ;
-                        convo[sender].push(msg);  
-
-                    }) ;
-              
-               
-                    //console.log(bundle.privatebox);
-                    var tab_convo = []
-                    for( var p in convo){
-                    var conv = new Object();
-                    conv.receiver = p;
-                    conv.msgs = [];
-                    conv.msgs = convo[p];
-                    tab_convo.push(conv);
-                    }
-
-                    //console.log(tab_convo);
-                    bundle.privatebox = tab_convo;
-              
-                });
-
-
-
-            var chatbox_messages =  models.Message.find( {  receiver : null},function (err, dcs) {
-                if (err) {
-                    res.send(500, err);
-                }
-
-                dcs = dcs.map(function(doc) {
-                    //console.log(new mongoose.Types.ObjectId(doc._id).getTimestamp());
-                    doc.date = new mongoose.Types.ObjectId(doc._id).getTimestamp().getTime();
-                    return doc;
-                });
-
-                bundle.connected = con;
-                bundle.chatroom = dcs;
-                console.log(" connecte "+ con);
-                //console.log(bundle);
-                res.send(200, bundle);
-            });
-        }
-    
-    });  
 };
 
 
@@ -258,7 +195,7 @@ exports.setMessage = function(req, res) {
 
 exports.sendMessage = function(req, res) {
     var slug = req.params.person;
-    
+   
     models.Person.findById(slug, function(err, person) {
         if (person === null) {
             res.send(404, 'Not found');
@@ -273,9 +210,35 @@ exports.sendMessage = function(req, res) {
                 if(err){
                     res.send(500,"pff");
                 }
-                else
-                    res.send(200,"impec");
+                else {
+                    if( req.body.networkmode == 1){
+                        // efface la premier requête puis l'envoi la fonction callback de getPersonsMessages
+                        var receiver = req.body.receiver;
+                        // si ce message est privé
+                        if ( receiver != null) {                       
+                            var index = findPersonIndex(receiver,start.requests);
+                            if ( index != -1){
+                                var rep = start.requests[index];
+                                start.requests.splice(index,1);
+                                console.log(start.requests);
+                                start.emitter.emit(receiver,receiver,rep.resp,rep.con);
+                            }
+                        }
+                        // si message pour la chatbox déclencher la réponse de tout le monde
+                        else{
 
+                                var j = 0;
+                                while (start.requests.length > 0){
+                                    var rep = start.requests.shift();
+                                    start.emitter.emit(rep.author,rep.author,rep.resp,rep.con);
+                                    
+                                }
+                               
+                            }
+
+                        }
+                    }
+                    res.send(200,"impec");
             });
 
         }
@@ -284,6 +247,18 @@ exports.sendMessage = function(req, res) {
     });
    
 };
+
+
+function findPersonIndex(name,tab){
+    var i = 0;
+    while ( i < tab.length  && tab[i].author != name ){
+        i++;
+    }
+    if ( i < tab.length)
+        return i;
+    else
+        return -1;
+}
 
 
 
@@ -309,34 +284,96 @@ exports.deleteMessage = function(req, res) {
     });
 };
 
-exports.createComment = function(req, res) {
-    var slug = req.params.person;
-    var messageSlug = req.params.message;
 
-    
-    if (!req.body.hasOwnProperty('body')) {
-        res.send(400, 'The "body" parameter is required');
-    }
-    
+
+
+
+
+// fonction callback à laquelle on passera les noms et la requête 
+// elle recoit ce que le trigger lui envoie dans sendMessage
+function getMessages(name,res,con){
+    var slug = name;
+    var bundle = {chatroom : [] , privatebox : [], connected : [] } ;
     models.Person.findById(slug, function(err, person) {
+        // si l'utisateur n'existe pas on le crée
         if (person === null) {
-            res.send(404, 'Person not found');
-        } else {
-            var message = person.messages.id(messageSlug);
-            if (message === null) {
-                res.send(404, 'Message not found');
-            } else {
-                var comment = { body: req.body.body };
-                message.comments.push(comment);
-                person.save();
-
-                res.send(201, comment);
-            }
+            var p = new models.Person();
+            p._id = name;
+            p.name = name;
+            p.save(function(err){
+                if(err){
+                    console.log("user creation failed");
+                    res.send(500,"you got screwed dude");
+                }
+                else{
+                    res.send(201,bundle);
+                    console.log("OK user created");
+                }
+            });
+            
         }
-    });
-};
+
+        else{        
+        // Sinon
+            var privatebox_messages =  models.Message.find( { 
+                receiver : { $ne : null  },  
+                $or: [  {receiver : person} , {author : person  } ]},
+                function (err,docs){
+
+                    if (err) {
+                        res.send(500, err);
+                    }
+
+                    var convo = [];
+
+                    docs.map( function (msg) {
+                    
+                        var sender =  (msg.author == person.name) ? msg.receiver : msg.author;
+                        msg.date = new mongoose.Types.ObjectId(msg._id).getTimestamp().getTime();
+                        convo[sender] = convo[sender] || [] ;
+                        convo[sender].push(msg);  
+
+                    }) ;
+              
+               
+                    //console.log(bundle.privatebox);
+                    var tab_convo = []
+                    for( var p in convo){
+                    var conv = new Object();
+                    conv.receiver = p;
+                    conv.msgs = [];
+                    conv.msgs = convo[p];
+                    tab_convo.push(conv);
+                    }
+
+                    //console.log(tab_convo);
+                    bundle.privatebox = tab_convo;
+
+                    var chatbox_messages =  models.Message.find( { receiver : null},
+                    function (err, dcs) {
+                        if (err) {
+                            res.send(500, err);
+                        }
+
+                        dcs = dcs.map(function(doc) {
+                                //console.log(new mongoose.Types.ObjectId(doc._id).getTimestamp());
+                                doc.date = new mongoose.Types.ObjectId(doc._id).getTimestamp().getTime();
+                                return doc;
+                        });
+
+                        bundle.connected = con;
+                        bundle.chatroom = dcs;
+                            
+                        //console.log(bundle);
+                        res.send(200, bundle);
+                    });
+              
+                });
 
 
 
-
-
+           
+        }
+    
+    });  
+}

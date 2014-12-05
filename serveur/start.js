@@ -1,7 +1,7 @@
 var express = require('express');
 var mongodb = require('mongodb');
 var models = require('./models.js');
-
+var EventEmitter = require("events").EventEmitter;
 
 
 mongodb.connect("mongodb://localhost/test", function(err, db) {
@@ -12,6 +12,11 @@ mongodb.connect("mongodb://localhost/test", function(err, db) {
 	
 	exports.db = db;
 });
+
+var requests = [];
+var emitter = new EventEmitter();
+exports.requests = requests;
+exports.emitter = emitter;
 
 
 
