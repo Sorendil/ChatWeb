@@ -4,7 +4,7 @@
  */
  
 userPseudo = "";
-api_root = "http://82.240.129.160:1337"
+var api_root;
 
 // Le <input> d'envoi de messages pour la Chatbox
 var $chatBoxWriteMessage;
@@ -543,6 +543,14 @@ var main = function() {
  * S'occupe de lancer toutes les fonctions et les initialisations
  */
 $( document ).ready(function() {
+
+    // Récupération de l'adresse du serveur
+    $.getScript( "scripts/server-infos.js", function( data, textStatus, jqxhr ) {
+        if( ! host ) host = "http://localhost";
+        if( ! port ) port = 1337;
+        api_root = host + ":" + port;
+        console.log( "Adresse serveur : " + api_root ); // Data returned
+    });
     
     // Bloquage du chat tant que le pseudo n'est pas fournit
     if( ! userPseudo )
