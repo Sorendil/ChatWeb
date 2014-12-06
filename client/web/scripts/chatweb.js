@@ -101,6 +101,8 @@ var manageMessages = function( $messagesContainer, getMessages, blocMessageName,
                 + "</div></div>");
             
             currentIdGetMessage++;
+            
+            $messagesContainer.scrollBottom();
         }
         // Si il reste au moins un message déjà existant (dans le DOM)
         else
