@@ -3,6 +3,7 @@ var start = require('./start.js');
 var mongoose = require('mongoose');
 var mongodb = require('mongodb');
 var EventEmitter = require("events").EventEmitter;
+var url = require('url');
 
 exports.methodNotAllowed = function(req, res) {
     res.send(405, 'Method not allowed');
@@ -117,12 +118,13 @@ exports.getPersonsMessages = function(req, res) {
         if(err){
             console.log("fuck it");
         }
+        var networkMode = url.parse(req.url, true).query.networkMode); // Le mode réseau
         // si le mode choisit est polling
-        if (req.headers.networkmode == 0) {
+        if ( 0 == networkMode ) {
             getMessages(req.params.person,res,results);
         }
         // mode long polling
-        else if(req.headers.networkmode == 1 ){
+        else if( 1 == networkMode ){
             // bundle contenant la requête qui est en suspend et les personnes actives
             var rep = { author : req.params.person ,resp : res  , con : results  };
             start.requests.push(rep);
@@ -131,8 +133,11 @@ exports.getPersonsMessages = function(req, res) {
           
         }
         // mode push
-        else{
+        else if ( 2 == networkMode ) {
             console.log("mode push");
+        }
+        else {
+            console.log("unknown mode");
         }
 
         con =  results;
@@ -211,7 +216,6 @@ exports.sendMessage = function(req, res) {
                     res.send(500,"pff");
                 }
                 else {
-                    if( req.body.networkmode == 1){
                         // efface la premier requête puis l'envoi la fonction callback de getPersonsMessages
                         var receiver = req.body.receiver;
                         // si ce message est privé
@@ -225,18 +229,17 @@ exports.sendMessage = function(req, res) {
                             }
                         }
                         // si message pour la chatbox déclencher la réponse de tout le monde
-                        else{
+                        else {
 
-                                var j = 0;
-                                while (start.requests.length > 0){
-                                    var rep = start.requests.shift();
-                                    start.emitter.emit(rep.author,rep.author,rep.resp,rep.con);
-                                    
-                                }
-                               
+                            var j = 0;
+                            while (start.requests.length > 0){
+                                var rep = start.requests.shift();
+                                start.emitter.emit(rep.author,rep.author,rep.resp,rep.con);
+                                
                             }
-
+                               
                         }
+
                     }
                     res.send(200,"impec");
             });
@@ -323,51 +326,52 @@ function getMessages(name,res,con){
                     if (err) {
                         res.send(500, err);
                     }
+                    else {
+                        var convo = [];
 
-                    var convo = [];
+                        docs.map( function (msg) {
+                        
+                            var sender =  (msg.author == person.name) ? msg.receiver : msg.author;
+                            msg.date = new mongoose.Types.ObjectId(msg._id).getTimestamp().getTime();
+                            convo[sender] = convo[sender] || [] ;
+                            convo[sender].push(msg);  
 
-                    docs.map( function (msg) {
-                    
-                        var sender =  (msg.author == person.name) ? msg.receiver : msg.author;
-                        msg.date = new mongoose.Types.ObjectId(msg._id).getTimestamp().getTime();
-                        convo[sender] = convo[sender] || [] ;
-                        convo[sender].push(msg);  
-
-                    }) ;
-              
-               
-                    //console.log(bundle.privatebox);
-                    var tab_convo = []
-                    for( var p in convo){
-                    var conv = new Object();
-                    conv.receiver = p;
-                    conv.msgs = [];
-                    conv.msgs = convo[p];
-                    tab_convo.push(conv);
-                    }
-
-                    //console.log(tab_convo);
-                    bundle.privatebox = tab_convo;
-
-                    var chatbox_messages =  models.Message.find( { receiver : null},
-                    function (err, dcs) {
-                        if (err) {
-                            res.send(500, err);
+                        }) ;
+                  
+                   
+                        //console.log(bundle.privatebox);
+                        var tab_convo = []
+                        for( var p in convo){
+                        var conv = new Object();
+                        conv.receiver = p;
+                        conv.msgs = [];
+                        conv.msgs = convo[p];
+                        tab_convo.push(conv);
                         }
 
-                        dcs = dcs.map(function(doc) {
-                                //console.log(new mongoose.Types.ObjectId(doc._id).getTimestamp());
-                                doc.date = new mongoose.Types.ObjectId(doc._id).getTimestamp().getTime();
-                                return doc;
-                        });
+                        //console.log(tab_convo);
+                        bundle.privatebox = tab_convo;
 
-                        bundle.connected = con;
-                        bundle.chatroom = dcs;
-                            
-                        //console.log(bundle);
-                        res.send(200, bundle);
-                    });
-              
+                        var chatbox_messages =  models.Message.find( { receiver : null},
+                        function (err, dcs) {
+                            if (err) {
+                                res.send(500, err);
+                            }
+                            else {
+                                dcs = dcs.map(function(doc) {
+                                        //console.log(new mongoose.Types.ObjectId(doc._id).getTimestamp());
+                                        doc.date = new mongoose.Types.ObjectId(doc._id).getTimestamp().getTime();
+                                        return doc;
+                                });
+
+                                bundle.connected = con;
+                                bundle.chatroom = dcs;
+                                
+                                //console.log(bundle);
+                                res.send(200, bundle);
+                            }
+                        });
+                    }
                 });
 
 

@@ -339,7 +339,7 @@ var manageResponse = function( data ) {
  */
 var pollingNetworkMode = function() {
     
-    // Récupération des messages toutes les 5 secondes
+    // Récupération des messages toutes les 2 secondes
     setInterval(function(){
         if( networkMode == 0 )
         {
@@ -365,13 +365,25 @@ var pollingNetworkMode = function() {
  */
 var longPollingNetworkMode = function() {
     
-    // Récupération des messages toutes les 5 secondes
-    /*setInterval(function(){
+    // Récupération des messages toutes les 12 secondes
+    setInterval(function(){
         if( networkMode == 1 )
         {
+            $.ajax(api_root + "/messages/" + userPseudo, {
+                dataType: "json",
+                data: {
+                    networkMode: networkMode
+                }
+            
+            })
+            .done( function( data ){
+                manageResponse( data );
+            })
+            .fail( function(data) {
+                console.log("Informations non recuperees");
+            });
         }
-    }, 2000);*/
-    console.log('longPollingMode');
+    }, 12000);
 };
 
 /**
