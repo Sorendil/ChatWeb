@@ -118,7 +118,7 @@ exports.getPersonsMessages = function(req, res) {
         if(err){
             console.log("fuck it");
         }
-        var networkMode = url.parse(req.url, true).query.networkMode); // Le mode réseau
+        var networkMode = url.parse(req.url, true).query.networkMode; // Le mode réseau
         // si le mode choisit est polling
         if ( 0 == networkMode ) {
             getMessages(req.params.person,res,results);
