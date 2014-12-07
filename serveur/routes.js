@@ -130,9 +130,15 @@ exports.getPersonsMessages = function(req, res) {
             // bundle contenant la requête qui est en suspend et les personnes actives
             var rep = { author : req.params.person ,resp : res  , con : results  };
             console.log(rep.author+ " 's  request registered : long polling");
-            start.requests.push(rep);
-            setTimeout(getMessages, 20000,rep.author,rep.resp,rep.con);
-
+            if(findPersonIndex(req.params.person,start.requests) == -1){
+                
+              var time_out = setTimeout(TimeOutHandler, 1500,rep.author,rep.resp,rep.con);
+              rep.time_out = time_out;
+              start.requests.push(rep);
+                
+            }
+            
+           
             
             // NON : start.emitter.on(req.params.person,getMessages);
           
@@ -172,8 +178,29 @@ exports.getPersonsMessages = function(req, res) {
    
  
 };
+
+function TimeOutHandler(author,resp,con){
+console.log("time out "+author);
+var index = findPersonIndex(author,start.requests);
+var rep = start.requests[index];
+start.requests.splice(index,1);
+getMessages(author,resp,con);
+clearTimeout(rep.time_out);
+} 
  
- 
+
+function findPersonIndex(name,tab){
+    var i = 0;
+    while ( i < tab.length  && tab[i].author != name ){
+        i++;
+    }
+    if ( i < tab.length)
+        return i;
+    else
+        return -1;
+}
+
+exports.findPersonIndex = findPersonIndex;
  
 exports.setMessage = function(req, res) {
     var slug = req.params.person;
@@ -314,7 +341,7 @@ exports.getMessages = getMessages = function getMessages(name,res,con){
         else{        
         // Sinon
             var privatebox_messages =  models.Message.find( { 
-                receiver : { $ne : null  },  
+                receiver : { $ne : null  }, 
                 $or: [  {receiver : person} , {author : person  } ]},
                 function (err,docs){
  
