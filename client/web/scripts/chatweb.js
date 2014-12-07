@@ -21,6 +21,11 @@ var $pseudoList;
 var refreshFeedbackImg = 0;
 var $refreshImage;
 
+// LongPolling attributes
+var lastLongPollingAge = 0;
+var maxLongPollingAge = 22; // Secondes
+var waitingForResponseLongPolling = false;
+
 // ======== MENU
 var $menu;
 var networkMode = 0; // 0 Pour Polling, 1 pour LongPolling, 2 pour Push
@@ -334,6 +339,9 @@ var manageResponse = function( data ) {
     managePrivateMessagingMessages( data );
     managePseudosList( data );
     refreshFeedback();
+    
+    // On redemande pour la requête LongPolling
+    askForLongPollingRequest();
 }
 
 /**
@@ -366,27 +374,35 @@ var pollingNetworkMode = function() {
  * Gestion du mode long polling
  */
 var longPollingNetworkMode = function() {
-    
-    // Récupération des messages toutes les 12 secondes
-    setInterval(function(){
-        if( networkMode == 1 )
-        {
-            $.ajax(api_root + "/messages/" + userPseudo, {
-                dataType: "json",
-                data: {
-                    networkMode: networkMode
-                }
-            
-            })
-            .done( function( data ){
-                manageResponse( data );
-            })
-            .fail( function(data) {
-                console.log("Informations non recuperees");
-            });
-        }
-    }, 12000);
+    // Récupération des messages toutes les 2 secondes
+    setInterval(askForLongPollingRequest, 2000);
 };
+
+/**
+ * Quand appelé, envoie une requête si lastLongPollingAge vaut maxLongPollingAge
+ */
+var askForLongPollingRequest = function() {
+    if( networkMode == 1 && ! waitingForResponseLongPolling )
+    {
+        waitingForResponseLongPolling = true;
+        $.ajax(api_root + "/messages/" + userPseudo, {
+            dataType: "json",
+            data: {
+                networkMode: networkMode
+            }
+        })
+        .done( function( data ){
+            manageResponse( data );
+        })
+        .fail( function(data) {
+            console.log("Informations non recuperees");
+        })
+        .always( function() {
+            // Dans tous les cas, on annonce que on n'attend plus de réponse pour LongPolling
+            waitingForResponseLongPolling = false;
+        });
+    }
+}
 
 /**
  * Gestion du mode push
@@ -444,6 +460,8 @@ var main = function() {
         else if ($( this ).hasClass('js-mode-longpolling'))
         {
             networkMode = 1;
+            // Et on demande à faire un long polling
+            askForLongPollingRequest();
         }
         else if ($( this ).hasClass('js-mode-push'))
         {
