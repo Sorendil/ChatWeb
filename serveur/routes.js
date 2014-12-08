@@ -311,6 +311,7 @@ exports.getMessages = getMessages = function getMessages(name,res,con, socket) {
                 else{
                     if( ! socket) res.send(201,bundle);
                     console.log("OK user created");
+                    start.sendNewMessages();
                 }
             });
             
