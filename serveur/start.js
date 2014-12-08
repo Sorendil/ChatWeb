@@ -4,7 +4,9 @@ var models = require('./models.js');
 var routes = require('./routes.js');
 var EventEmitter = require("events").EventEmitter;
 
- 
+var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
  
 mongodb.connect("mongodb://localhost/test", function(err, db) {
 	if(err) { 
@@ -31,12 +33,10 @@ var handler = require('./handler.js');
 var emitter = new EventEmitter();
 // Lorsqu'on reçoit une notification de nouveau message sur la chatbox,
 // On relache toutes les requêtes en attente
-emitter.on('newChatBoxMessage',handler.ChatBoxMessageHandler);
+emitter.on('newChatBoxMessage', handler.ChatBoxMessageHandler);
 // Lorsqu'un reçoit une notification de nouveau message privé
-emitter.on('newPrivateMesssagingMessage',handler.PrivateBoxMessageHandler);
- 
-// ICI :
-// Faire un setInterval toutes les secondes qui regarde chaque requête et les libères si elles sont agées de 10 secondes !
+emitter.on('newPrivateMesssagingMessage', handler.PrivateBoxMessageHandler);
+
  
 exports.emitter = emitter;
  
@@ -54,7 +54,7 @@ var allowCrossDomain = function(req, res, next) {
  
  
  
-var app = express();
+
 app.use(express.bodyParser());
 app.use(allowCrossDomain);
  
@@ -84,9 +84,52 @@ app.delete('/:person', routes.deletePerson);
 app.get('/:person/:message', routes.getMessage);
 app.post('/:person/:message', routes.methodNotAllowed);
 app.delete('/:person/:message', routes.deleteMessage);
+
+// Push network mode
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+  
+  socket.pseudo="";
+  
+  socket.on('setPseudo', function(pseudo) {
+    socket.pseudo = pseudo;
+    console.log('PSEUDO');
+    console.log(socket.pseudo);
+  });
+  
+  socket.on('askForUpdate', function() {
+    console.log('Ask for update !');
+    routes.getMessages(socket.pseudo, null, null, socket);
+  });
+  
+  socket.on('pushModeEnable', function() {
+    socket.join('askingForNews');
+    console.log('user asking for enabling push mode');
+  });
+  socket.on('pushModeDisable', function() {
+    socket.leave('askingForNews');
+    console.log('user asking for disabling push mode');
+  });
+});
+
+// On envoie les messages à tous les connectés qui sont en mode push (donc qui sont dans le groupe 'askingForNews'
+exports.sendNewMessages = function(privateMessagingPseudos) {
+  // Pour chaque socket qui demande à être notifié
+  var clients = io.sockets.adapter.rooms['askingForNews'];
+  if (clients != undefined)
+  {
+    for (var clientId in clients) {
+      client_socket = io.sockets.connected[clientId];
+      
+      if( ! privateMessagingPseudos || privateMessagingPseudos.sender == client_socket.pseudo || privateMessagingPseudos.receiver == client_socket.pseudo)
+        routes.getMessages("Sorendil", null, null, client_socket);
+    }
+  }
+};
  
- 
- 
- 
-app.listen(process.env.PORT || 1337);
-console.log('Listening on port 1337');
+http.listen(1337, function(){
+    console.log('listening on *:1337');
+});

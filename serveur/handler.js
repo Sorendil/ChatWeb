@@ -6,6 +6,8 @@ var requests = start.requests;
 
 function ChatBoxMessageHandler(){
 
+    // Traitement des requêtes en attente en mode réseau LongPolling
+    
     // Tant qu'il reste une requête dans le tableau de requêtes
     while (requests.length > 0) {
         // On récupère la première requête du tableau et on l'enlève
@@ -15,7 +17,8 @@ function ChatBoxMessageHandler(){
         console.log("group message sent to "+rep.author);
     }
 
-
+    // Traitement des utilisateurs connectés en mode Push
+    start.sendNewMessages();
 }
 
 
@@ -32,10 +35,8 @@ function PrivateBoxMessageHandler(sender,receiver){
         console.log("private message sent to "+rep.author);
 	}
 
-
-
-
-
+    // Traitement des utilisateurs connectés en mode Push
+    start.sendNewMessages( {"sender": sender, "receiver": receiver});
 }
 
  

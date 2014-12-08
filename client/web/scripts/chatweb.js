@@ -2,7 +2,10 @@
 /**
  * DONNEES
  */
- 
+
+// Si déconnecté alors null
+var socket = null;
+
 userPseudo = "";
 var api_root;
 
@@ -408,7 +411,10 @@ var askForLongPollingRequest = function() {
  * Gestion du mode push
  */
 var pushNetworkMode = function() {
-    console.log('pushMode');
+    socket.on('newMessage', function(bundle) {
+        manageResponse( bundle );
+        console.log('Réponse en mode network push reçue !');
+    });
 };
 
 
@@ -424,6 +430,9 @@ var refreshFeedback = function() {
 var main = function() {
     // ======== DONNEES
     // ====================
+    
+    socket = io(api_root);
+    socket.emit('setPseudo', userPseudo);
     
     // ======= CHAT BOX
     // Le <input> d'envoi de messages pour la Chatbox
@@ -453,6 +462,13 @@ var main = function() {
         $menu.find('a').removeClass('active');
         $( this ).addClass('active');
         
+        // Si on était en mode push et qu'on change de mode
+        if( 2 == networkMode && ! $( this ).hasClass('js-mode-push') )
+        {
+            // On doit informer le serveur qu'on ne veut plus être notifié
+            socket.emit('pushModeDisable');
+        }
+        
         if ($( this ).hasClass('js-mode-polling'))
         {
             networkMode = 0;
@@ -466,6 +482,8 @@ var main = function() {
         else if ($( this ).hasClass('js-mode-push'))
         {
             networkMode = 2;
+            // On doit informer le serveur qu'on veut être notifier
+            socket.emit('pushModeEnable');
         }
         else
         {
@@ -534,6 +552,10 @@ var main = function() {
             );
             
             $privateMessagingContainer.append($newPrivateMessaging);
+            if ( 2 == networkMode )
+            {
+                socket.emit('askForUpdate');
+            }
         }
     });
     
