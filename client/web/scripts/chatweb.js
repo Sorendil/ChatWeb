@@ -42,6 +42,12 @@ jQuery.fn.extend({
         this.scrollTop(this.prop("scrollHeight"));
 }});
 
+function stripHTML(dirtyString) {
+    var container = document.createElement('div');
+    container.innerHTML = dirtyString;
+    return container.textContent || container.innerText;
+}
+
 /**
  * Pour ne pas mettre en cache les résultats des messages
  */
@@ -302,7 +308,7 @@ var manageWriteMessages = function( event ) {
     //console.log($messagingFormMessageInput);
     
     // Le contenu du message
-    messagingFormMessageContent = $messagingFormMessageInput.val();
+    messagingFormMessageContent = stripHTML($messagingFormMessageInput.val());
     
     // Le bloc messagerie (ChatBox ou PrivateMessaging)
     $messagingBloc = $(this).parents('.js-Messaging');
