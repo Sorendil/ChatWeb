@@ -622,7 +622,6 @@ $( document ).ready(function() {
             pseudoVal = $.trim(stripHTML($selectPseudoForm.find('.js-selectPseudoInput').val()));
             if ( pseudoVal != "" )
             {
-                alert(pseudoVal);
                 userPseudo = pseudoVal;
                 // Lancement de la fonction d'initialisation du tchat
                 startChat();
